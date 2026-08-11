@@ -317,7 +317,7 @@ Each step built on the last, and it was a great exercise in real-world exploitat
 	
 2. Understand TTYs 
 	- A Linux terminal is represented by a device such as:
-		/dev/pts/3
+		`/dev/pts/3`
 	- who and tty are useful for identifying logged-in users and terminals.
 	
 3. TTYs can become an attack surface 
@@ -330,7 +330,7 @@ Each step built on the last, and it was a great exercise in real-world exploitat
 	
 5. Linux permissions matter 
 	- Always inspect permissions on interesting devices/files:
-		ls -l /dev/pts/*
+		`ls -l /dev/pts/*`
 	- Understand read (r), write (w), and execute (x) permissions.
 	
 6. Not every privesc is a kernel exploit
