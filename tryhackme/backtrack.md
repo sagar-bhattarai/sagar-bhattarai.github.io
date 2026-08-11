@@ -283,10 +283,15 @@ bash -p
 ---
 
 ## Conclusion
-
 The Backtrack room involved a mix of:
 
-
+- Linux enumeration
+- TTY/terminal enumeration
+- Abusing writable TTY devices
+- TTY pushback attacks
+- Exploiting careless administrator behavior
+- Privilege escalation through terminal injection
+- Root access
 
 Each step built on the last, and it was a great exercise in real-world exploitation chains.
 
@@ -306,9 +311,53 @@ Each step built on the last, and it was a great exercise in real-world exploitat
 
 ## The lessons learned from the room are:
 
-1. Reconnaissance reveals the attack surface
+1. Enumeration comes first 
+	- Don't immediately search for an exploit.
+	- Check users, groups, processes, services, permissions, and active terminals.
+	
+2. Understand TTYs 
+	- A Linux terminal is represented by a device such as:
+		/dev/pts/3
+	- who and tty are useful for identifying logged-in users and terminals.
+	
+3. TTYs can become an attack surface 
+	- If an unprivileged user can write to another user's TTY, they may be able to inject text into that user's terminal.
+	- This becomes especially interesting when the other user has higher privileges.
+	
+4. Human behavior can be part of the vulnerability 
+	- Privilege escalation doesn't always require a technical exploit.
+	- A careless administrator executing something they see in their terminal can create an escalation path.
+	
+5. Linux permissions matter 
+	- Always inspect permissions on interesting devices/files:
+		ls -l /dev/pts/*
+	- Understand read (r), write (w), and execute (x) permissions.
+	
+6. Not every privesc is a kernel exploit
+	You should consider:
+	- SUID/SGID
+	- sudo
+	- capabilities
+	- cron jobs
+	- writable files/scripts
+	- services
+	- TTYs
+	- environment variables
+	- misconfigurations
 
-	You begin with scanning:
- 		nmap -sC -sV -p- -T5 -v <target-ip>
+7. Think about attack paths, not individual vulnerabilities 
+
+	A useful mindset is:
+
+	Low-privileged user
+	       ↓
+	Find unusual permission
+	       ↓
+	Abuse legitimate Linux functionality
+	       ↓
+	Influence privileged user/process
+	       ↓
+	Higher privileges
+
 
 *Thanks for reading!*
