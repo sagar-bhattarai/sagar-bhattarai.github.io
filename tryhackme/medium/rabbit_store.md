@@ -1091,7 +1091,7 @@ Phase 5 — Privilege escalation
 
 few things from the room to remember.
 
-Lesson ---------------------------------------- Why it matters
+-------- Lesson ---------------------------------------- Why it matters --------
 
 - 🔎 Enumerate broadly	                    ::  Important services may not be HTTP/SSH
 - 🌐 Understand APIs	                    ::  Backend functionality can expose attack paths
