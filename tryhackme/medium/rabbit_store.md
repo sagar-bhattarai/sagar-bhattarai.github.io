@@ -1091,18 +1091,18 @@ Phase 5 — Privilege escalation
 
 few things from the room to remember.
 
-Lesson						Why it matters
+Lesson ---------------------------------------- Why it matters
 
-- 🔎 Enumerate broadly				Important services may not be HTTP/SSH
-- 🌐 Understand APIs				Backend functionality can expose attack paths
-- 🐇 Understand RabbitMQ			Message brokers can become part of the attack surface
-- 🔐 Reuse discovered credentials carefully	One credential can unlock multiple services
-- 🧩 Understand authentication			Cookies, tokens, hashes and encoding are different
-- 🐛 Troubleshoot failures			An error doesn't necessarily mean the technique is impossible
-- 🖥️ Enumerate after getting a shell		Initial access ≠ root
-- ⬆️ Study Linux permissions			Misconfigured permissions frequently enable escalation
-- 🔗 Chain weaknesses				Multiple small findings can produce a complete compromise
-- 🧠 Ask "what next?"				This is the core penetration-testing mindset
+- 🔎 Enumerate broadly	                    ::  Important services may not be HTTP/SSH
+- 🌐 Understand APIs	                    ::  Backend functionality can expose attack paths
+- 🐇 Understand RabbitMQ                    ::  Message brokers can become part of the attack surface
+- 🔐 Reuse discovered credentials carefully ::	One credential can unlock multiple services
+- 🧩 Understand authentication	            ::  Cookies, tokens, hashes and encoding are different
+- 🐛 Troubleshoot failures		    ::	An error doesn't necessarily mean the technique is impossible
+- 🖥️ Enumerate after getting a shell	    ::	Initial access ≠ root
+- ⬆️ Study Linux permissions		    ::	Misconfigured permissions frequently enable escalation
+- 🔗 Chain weaknesses			    ::	Multiple small findings can produce a complete compromise
+- 🧠 Ask "what next?"			    ::	This is the core penetration-testing mindset
 
 
 *Thanks for reading!*
