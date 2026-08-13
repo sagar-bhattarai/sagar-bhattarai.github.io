@@ -1,0 +1,101 @@
+/* About page hero */
+.dynamic-title{
+  display:none;
+}
+
+.about-hero {
+  position:relative;
+  margin-top: 3rem;
+  margin-bottom: 5rem;
+}
+
+.hero-terminal {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: #58a6ff;
+}
+
+.hero-terminal .prompt {
+  color: #7ee787;
+  font-weight: 700;
+  margin-right: 0.5rem;
+}
+
+.about-hero h1 {
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  line-height: 1;
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+}
+
+.about-hero h1 p{
+  display:flex;
+}
+
+.about-hero .hero-role{
+font-style: italic;
+}
+
+.about-hero h1 span {
+  display: block;
+  color: #58a6ff;
+}
+
+.about-hero .hero-description {
+  max-width: 700px;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #8b949e;
+}
+
+#avatar{
+  opacity:0 !important;
+}
+
+.hacker_image{
+  position: absolute;
+  top: -111px;
+  right: 0;
+}
+
+.blink{
+  width: 7px;
+  height: 1.2em;
+  margin-left: 5px;
+  color: #7ee787 !important;
+  vertical-align: middle;
+  animation: terminal-blink 0.9s steps(2, start) infinite;
+}
+
+@keyframes terminal-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (min-width:845px) and (max-width:1200px){
+.hacker_image{
+  top: -66px;
+  right: -33px; 
+ }
+}
+
+@media (min-width:1200px) and (max-width:1275px){
+.hacker_image{
+  right:20px; 
+ }
+}
+
+@media (max-width:666px){
+.hacker_image{
+  width:5rem;
+  right:-20px;
+ }
+}

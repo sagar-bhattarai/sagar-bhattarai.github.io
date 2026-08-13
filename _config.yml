@@ -1,12 +1,100 @@
-title: "CyberSecurity Portfolio"
-description: "Cybersecurity labs, CTF write-ups, tools and notes"
-author: "SagarBhattarai"
+# ===============================
+# Site settings
+# ===============================
 
-theme: minima
+lang: en
+timezone: Asia/Kathmandu
+
+title: ""
+tagline: ""
+description: >-
+  Cybersecurity write-ups, CTFs, penetration testing,
+  security research, projects and notes.
+
+url: "https://sagar-bhattarai.github.io"
+baseurl: ""
+
+github:
+  username: sagar-bhattarai
+
+social:
+  name: "Sagar Bhattarai"
+  email: ""
+  links:
+    - https://github.com/sagar-bhattarai
+
+theme: jekyll-theme-chirpy
+
+# ===============================
+# Jekyll
+# ===============================
 
 markdown: kramdown
-highlighter: rouge
 
-plugins:
-  - jekyll-feed
-  - jekyll-seo-tag
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
+
+collections:
+  tabs:
+    output: true
+    sort_by: order
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+      comments: false
+
+  - scope:
+      path: ""
+      type: tabs
+    values:
+      layout: page
+
+# ===============================
+# Chirpy
+# ===============================
+
+toc: true
+
+paginate: 10
+paginate_path: /page/:num/
+
+theme_mode:
+
+avatar: /assets/images/profile.jpeg
+
+social_preview_image:
+
+comments:
+  active: false
+
+pwa:
+  enabled: true
+
+analytics:
+  provider:
+  google:
+    id:
+
+pageviews:
+  provider:
+  google:
+    property:
+
+assets:
+  self_host:
+    enabled: true
+
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings: []
+  blanklines: false
+  profile: false

@@ -1,0 +1,19 @@
+title: "NeonGems"
+description: "Cybersecurity write-ups, CTFs, projects and notes"
+author: "sagar-bhattarai"
+
+markdown: kramdown
+highlighter: rouge
+
+permalink: /posts/:title/
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"

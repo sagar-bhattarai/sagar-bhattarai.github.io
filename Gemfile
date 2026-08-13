@@ -1,7 +1,3 @@
 source "https://rubygems.org"
 
-gem "jekyll"
-gem "minima"
-gem "jekyll-feed"
-gem "jekyll-seo-tag"
-
+gem "jekyll-theme-chirpy", "~> 7.5", ">= 7.5.0"
