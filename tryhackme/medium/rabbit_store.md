@@ -495,6 +495,7 @@ Each step built on the last, and it was a great exercise in real-world exploitat
 ## Tools Used
  - nmap
  - gobuster
+ - burpsuite
 
  
 🖼️ **Find all screenshots here:** [`screenshots/rabbit_store/`](../screenshots/rabbit_store/)
