@@ -1,0 +1,12 @@
+title: "CyberSecurity Portfolio"
+description: "Cybersecurity labs, CTF write-ups, tools and notes"
+author: "SagarBhattarai"
+
+theme: minima
+
+markdown: kramdown
+highlighter: rouge
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
