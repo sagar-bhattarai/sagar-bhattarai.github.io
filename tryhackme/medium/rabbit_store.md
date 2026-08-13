@@ -498,7 +498,7 @@ Each step built on the last, and it was a great exercise in real-world exploitat
  - burpsuite
 
  
-🖼️ **Find all screenshots here:** [`screenshots/rabbit_store/`](../../../screenshots/rabbit_store/)
+🖼️ **Find all screenshots here:** [`screenshots/rabbit_store/`](../../screenshots/rabbit_store/)
 
 
 
