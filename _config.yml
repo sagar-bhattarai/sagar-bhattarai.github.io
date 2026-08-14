@@ -60,6 +60,21 @@ defaults:
       layout: page
 
 # ===============================
+# Archives
+# ===============================
+
+jekyll-archives:
+  enabled:
+    - categories
+    - tags
+  layouts:
+    category: category
+    tag: tag
+  permalinks:
+    category: /categories/:name/
+    tag: /tags/:name/
+
+# ===============================
 # Chirpy
 # ===============================
 
