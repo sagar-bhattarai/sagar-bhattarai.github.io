@@ -89,7 +89,7 @@ pageviews:
 
 assets:
   self_host:
-    enabled: true
+    enabled: false
 
 compress_html:
   clippings: all
