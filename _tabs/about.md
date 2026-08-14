@@ -8,7 +8,7 @@ order: 4
 <div class="about-hero">
 
   <div class="hero-terminal">
-    <span class="prompt">$</span>
+    <span class="prompt">#</span>
     whoami
   </div>
 
