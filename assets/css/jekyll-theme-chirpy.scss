@@ -21,10 +21,10 @@
   object-fit: contain !important;
 }
 
-#sidebar-bottom .btn.btn-link.nav-link {
-  margin: 0 5px;
+.sidebar-bottom .btn.btn-link.nav-link {
+  margin: 0 5px !important;
 }
 
-#sidebar-bottom .btn.btn-link.nav-link:hover {
-  color:#fff;
+.sidebar-bottom .btn.btn-link.nav-link:hover {
+  color:#fff !important;
 }
