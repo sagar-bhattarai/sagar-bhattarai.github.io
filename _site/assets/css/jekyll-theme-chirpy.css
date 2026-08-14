@@ -3562,7 +3562,8 @@ header h1 + .post-meta {
 }
 
 /* Your custom CSS */
-.post-preview .preview-img img {
+.post-preview .preview-img img,
+.post-meta .popup img {
   object-fit: contain !important;
 }
 
