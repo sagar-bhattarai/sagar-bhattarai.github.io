@@ -5,12 +5,8 @@
   $theme: '{{ site.theme_mode }}'
 );
 
-/* prettier-ignore */
-@use 'main';
-
-/* Your custom CSS */
-
-.post-preview .preview-img img,
-.post-meta .popup img{
-  object-fit: contain !important;
-}
+@use 'main
+{%- if jekyll.environment == 'production' -%}
+  .bundle
+{%- endif -%}
+';
