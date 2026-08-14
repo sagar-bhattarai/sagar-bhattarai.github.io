@@ -10,3 +10,13 @@
   .bundle
 {%- endif -%}
 ';
+
+
+/* =========================
+   CUSTOM CSS
+   ========================= */
+   
+.post-preview .preview-img img,
+.post-meta .popup img{
+  object-fit: contain !important;
+}
