@@ -13,11 +13,13 @@
   font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 1rem;
   margin-bottom: 1.5rem;
-  color: #58a6ff;
+  /* color: #58a6ff; */
+  color: #39ff14;
 }
 
 .hero-terminal .prompt {
-  color: #7ee787;
+ /* color: #7ee787; */
+  color: #39ff14;
   font-weight: 700;
   margin-right: 0.5rem;
 }
@@ -39,7 +41,8 @@ font-style: italic;
 
 .about-hero h1 span {
   display: block;
-  color: #58a6ff;
+ /*  color: #58a6ff; */
+  color:#04d9ff;
 }
 
 .about-hero .hero-description {
@@ -63,7 +66,8 @@ font-style: italic;
   width: 7px;
   height: 1.2em;
   margin-left: 5px;
-  color: #7ee787 !important;
+  /* color: #7ee787 !important; */
+  color: #39ff14 !important;
   vertical-align: middle;
   animation: terminal-blink 0.9s steps(2, start) infinite;
 }
