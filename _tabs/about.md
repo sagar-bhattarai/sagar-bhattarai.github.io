@@ -4,7 +4,7 @@ title: About
 icon: fas fa-user
 order: 4
 ---
-<link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/about.css' | relative_url }}">
 <div class="about-hero">
 
   <div class="hero-terminal">

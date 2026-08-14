@@ -41,6 +41,7 @@ font-style: italic;
 
 .about-hero h1 span {
   display: block;
+  font-family: fantasy;
  /*  color: #58a6ff; */
   color:#04d9ff;
 }

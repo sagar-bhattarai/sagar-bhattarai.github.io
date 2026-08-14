@@ -3561,6 +3561,9 @@ header h1 + .post-meta {
   margin-bottom: -1px; /* Avoid jumping */
 }
 
-/* append your custom style below */
+/* Your custom CSS */
+.post-preview .preview-img img {
+  object-fit: contain !important;
+}
 
 /*# sourceMappingURL=jekyll-theme-chirpy.css.map */
