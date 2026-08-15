@@ -22,8 +22,7 @@ status: Completed
 
 ## Overview :
 
-This is a detailed walkthrough of how I rooted the **Dreaming** room on TryHackMe and captured both user and root flags. The room involved `web application enumeration`, `Lateral Movement` and `command substitution ( MySQL injection)`.
-
+This is a detailed walkthrough of how I rooted the **Dreaming** room on TryHackMe and captured both user and root flags. 
 
 ---
 
