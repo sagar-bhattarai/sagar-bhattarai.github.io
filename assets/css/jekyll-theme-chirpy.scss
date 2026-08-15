@@ -25,6 +25,35 @@
   margin: 0 5px !important;
 }
 
+
+
+
+
+
 .sidebar-bottom .btn.btn-link.nav-link:hover {
   color:#fff !important;
+}
+
+.card.categories a:hover,
+#access-lastmod a:hover,
+#topbar-wrapper #topbar #breadcrumb span a:hover{
+ color:#2ECC40 !important;  /* neon green = #39FF14 */
+ border-bottom: 1px solid #2ECC40;
+}
+
+main article #tags a:hover,
+article #archives ul li a:hover{
+ color:#2ECC40 !important;  /* neon green = #39FF14 */
+}
+
+main article #tags a,
+.card.categories a,
+article #archives ul li a,
+#topbar #breadcrumb span a{
+ color:#04d9ff !important; /* neon blue */
+}
+
+.btn.btn-outline-primary:not(.disabled):hover{
+ background-color:#00BFFF!important; /* neon blue = #04d9ff */
+ border-color: #00BFFF !important;
 }
