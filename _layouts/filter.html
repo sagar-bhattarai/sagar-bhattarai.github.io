@@ -1,0 +1,63 @@
+---
+layout: default
+---
+
+<div id="archives" class="px-1">
+  <h1 class="dynamic-title">
+    {{ page.title }}
+  </h1>
+
+  <section>
+    {% assign matching_posts = '' | split: '' %}
+
+    {% for post in site.posts %}
+
+      {% if page.filter_type == "level" %}
+        {% if post.level == page.filter_value %}
+          {% assign matching_posts = matching_posts | push: post %}
+        {% endif %}
+      {% endif %}
+
+      {% if page.filter_type == "platform" %}
+        {% if post.platform == page.filter_value %}
+          {% assign matching_posts = matching_posts | push: post %}
+        {% endif %}
+      {% endif %}
+
+      {% if page.filter_type == "series" %}
+        {% if post.series == page.filter_value %}
+          {% assign matching_posts = matching_posts | push: post %}
+        {% endif %}
+      {% endif %}
+
+    {% endfor %}
+
+    {% if matching_posts.size > 0 %}
+
+      <ul class="post-content ps-0">
+
+        {% for post in matching_posts %}
+
+          <li class="d-flex py-3">
+            <div class="me-3">
+              <time datetime="{{ post.date | date_to_xmlschema }}">
+                {{ post.date | date: "%b %d, %Y" }}
+              </time>
+            </div>
+
+            <a href="{{ post.url | relative_url }}">
+              {{ post.title }}
+            </a>
+          </li>
+
+        {% endfor %}
+
+      </ul>
+
+    {% else %}
+
+      <p>No posts found.</p>
+
+    {% endif %}
+  </section>
+</div>

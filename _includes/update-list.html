@@ -1,0 +1,138 @@
+{% assign MAX_SIZE = 5 %}
+
+<!-- ========================= -->
+<!-- Recently Updated -->
+<!-- ========================= -->
+
+{% assign all_list = '' | split: '' %}
+
+{% for post in site.posts %}
+  {% assign datetime = post.last_modified_at | default: post.date %}
+
+  {% capture elem %}
+    {{- datetime | date: "%Y%m%d%H%M%S" -}}::{{- forloop.index0 -}}
+  {% endcapture %}
+
+  {% assign all_list = all_list | push: elem %}
+{% endfor %}
+
+{% assign all_list = all_list | sort | reverse %}
+
+{% assign update_list = '' | split: '' %}
+
+{% for entry in all_list limit: MAX_SIZE %}
+  {% assign update_list = update_list | push: entry %}
+{% endfor %}
+
+{% if update_list.size > 0 %}
+  <section id="access-lastmod">
+    <h2 class="panel-heading">
+      {{- site.data.locales[include.lang].panel.lastmod -}}
+    </h2>
+
+    <ul class="content list-unstyled ps-0 pb-1 ms-1 mt-2">
+      {% for item in update_list %}
+        {% assign index = item | split: '::' | last | plus: 0 %}
+        {% assign post = site.posts[index] %}
+        {% assign url = post.url | relative_url %}
+
+        <li class="text-truncate lh-lg">
+          <a href="{{ url }}">{{ post.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+
+<!-- ========================= -->
+<!-- Levels -->
+<!-- ========================= -->
+
+{% assign levels = '' | split: '' %}
+
+{% for post in site.posts %}
+  {% if post.level %}
+    {% assign levels = levels | push: post.level %}
+  {% endif %}
+{% endfor %}
+
+{% assign levels = levels | uniq | sort %}
+
+{% if levels.size > 0 %}
+  <section>
+    <h2 class="panel-heading">Levels</h2>
+
+    <div class="d-flex flex-wrap mt-3 mb-1 me-3">
+      {% for level in levels %}
+        <a
+          class="post-tag btn btn-outline-primary"
+          href="{{ '/levels/' | append: level | slugify | append: '/' | relative_url }}">
+          {{ level }}
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+
+<!-- ========================= -->
+<!-- Platforms -->
+<!-- ========================= -->
+
+{% assign platforms = '' | split: '' %}
+
+{% for post in site.posts %}
+  {% if post.platform %}
+    {% assign platforms = platforms | push: post.platform %}
+  {% endif %}
+{% endfor %}
+
+{% assign platforms = platforms | uniq | sort %}
+
+{% if platforms.size > 0 %}
+  <section>
+    <h2 class="panel-heading">Platforms</h2>
+
+    <div class="d-flex flex-wrap mt-3 mb-1 me-3">
+      {% for platform in platforms %}
+        <a
+          class="post-tag btn btn-outline-primary"
+          href="{{ '/platforms/' | append: platform | slugify | append: '/' | relative_url }}">
+          {{ platform }}
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+
+<!-- ========================= -->
+<!-- Series -->
+<!-- ========================= -->
+
+{% assign series_list = '' | split: '' %}
+
+{% for post in site.posts %}
+  {% if post.series %}
+    {% assign series_list = series_list | push: post.series %}
+  {% endif %}
+{% endfor %}
+
+{% assign series_list = series_list | uniq | sort %}
+
+{% if series_list.size > 0 %}
+  <section>
+    <h2 class="panel-heading">Series</h2>
+
+    <div class="d-flex flex-wrap mt-3 mb-1 me-3">
+      {% for series in series_list %}
+        <a
+          class="post-tag btn btn-outline-primary"
+          href="{{ '/series/' | append: series | slugify | append: '/' | relative_url }}">
+          {{ series }}
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}

@@ -44,6 +44,19 @@ collections:
   tabs:
     output: true
     sort_by: order
+    collections:
+
+  levels:
+    output: true
+    permalink: /levels-:name/
+
+  platforms:
+    output: true
+    permalink: /platforms-:name/
+
+  series:
+    output: true
+    permalink: /series-:name/
 
 defaults:
   - scope:
