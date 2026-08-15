@@ -33,6 +33,7 @@
   color:#fff !important;
 }
 
+main article #page-tag ul > li > a:hover,
 .card.categories a:hover,
 #access-lastmod a:hover,
 #topbar-wrapper #topbar #breadcrumb span a:hover{
@@ -46,6 +47,7 @@ article #archives ul li a:hover{
  color:#2ECC40 !important;  /* neon green = #39FF14 */
 }
 
+article #page-tag ul > li > a,
 #archives .post-content a,
 main article #tags a,
 .card.categories a,
