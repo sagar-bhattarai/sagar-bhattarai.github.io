@@ -57,8 +57,9 @@ font-style: italic;
 position:relative;
 }
 
-#avatar:before{content: "";
+#avatar:after{content: "";
   display: block;
+  top:0;
   position: absolute;
   z-index: 99999;
   width: 100%;
@@ -67,7 +68,6 @@ position:relative;
   background-size: cover;
   background-repeat: no-repeat;
   border-radius: 50%;
-  /*background-image: url(https://www.root.com./imgs/r.jpg);*/
   background-image: url("/assets/images/root.jpg");
 }
 
