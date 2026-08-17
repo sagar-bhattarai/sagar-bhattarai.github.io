@@ -23,7 +23,7 @@ status: Completed
 
 ## Overview
 
-This is a detailed walkthrough of how I gained access to administrator on the **Attacktive Directory** room on TryHackMe and captured all three users  flags. The room involved Enumeration via kerberos, Abusing kerberos and elevating the privileges through misconfigured or disabled Pre-Authentication".
+This is a detailed walkthrough of how I gained access to administrator on the **Attacktive Directory** room on TryHackMe and captured all three users  flags. The room involved Enumeration via kerberos, Abusing kerberos and elevating the privileges through misconfigured or disabled Pre-Authentication". 
 
 ---
 
