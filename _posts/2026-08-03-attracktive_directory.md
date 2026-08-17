@@ -1,4 +1,25 @@
-# TryHackMe - Attacktive Directory Room Writeup
+---
+title: "Attacktive Directory - TryHackMe"
+date: 2026-08-03 10:00:00 +0545
+
+description: Enumeration via kerberos, Abusing kerberos and elevating the privileges through misconfigured or disabled Pre-Authentication" are the coverings of this Attacktive Directory room .
+
+categories: [Web, Windows]
+tags: [web, windows, active-directory, nmap, kerberos, enum4linux, impacket, smbclient, john]
+
+image:
+  path: /assets/img/posts/attacktive_directory.png
+  alt: "Attacktive Directory TryHackMe"
+
+level: medium
+platform: TryHackMe
+series: "Windows"  
+  
+room: "Attacktive Directory"
+type: "CTF Write-up"
+status: Completed 
+---
+
 
 ## Overview
 
