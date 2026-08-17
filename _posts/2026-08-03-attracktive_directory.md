@@ -11,7 +11,7 @@ image:
   path: /assets/img/posts/attacktive_directory.png
   alt: "Attacktive Directory TryHackMe"
 
-level: medium
+level: Medium
 platform: TryHackMe
 series: "Windows"  
   
