@@ -8,7 +8,7 @@ categories: [Web, Windows]
 tags: [web, windows, active-directory, nmap, kerberos, enum4linux, impacket, smbclient, john]
 
 image:
-  path: /assets/img/posts/attacktive_directory.png
+  path: /assets/img/posts_thumbnails/attacktive_directory.png
   alt: "Attacktive Directory TryHackMe"
 
 level: Medium

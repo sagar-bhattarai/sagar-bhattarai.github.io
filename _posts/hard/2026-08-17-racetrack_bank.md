@@ -8,7 +8,7 @@ categories: [Web, Linux]
 tags: [web, linux]
 
 image:
-  path: /assets/img/posts/racetrack_bank.png
+  path: /assets/img/posts_thumbnails/racetrack_bank.png
   alt: "Racetrack Bank TryHackMe"
 
 level: Hard

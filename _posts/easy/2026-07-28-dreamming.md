@@ -3,13 +3,13 @@ title: "Dreaming - TryHackMe"
 date: 2026-07-28 10:10:00 +0545
 
 image:
-  path: /assets/img/posts/dreaming.webp
+  path: /assets/img/posts_thumbnails/dreaming.webp
   alt: "Dreaming TryHackMe"
 
 description: "Dreaming walkthrough covering web application enumeration, Lateral Movement and command substitution ( MySQL injection)"
   
 categories: [Web, Linux]
-tags: [web, linux, nmap, command substitution, MySQL injection, web-exploitation]
+tags: [web, linux, nmap, command substitution, MySQL injection]
 
 level: Easy
 platform: TryHackMe
