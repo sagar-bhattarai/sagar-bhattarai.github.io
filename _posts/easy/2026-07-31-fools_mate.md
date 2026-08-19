@@ -9,7 +9,7 @@ image:
   alt: "Fools Mate TryHackMe"
 
 categories: [Web, Linux]
-tags: [web, linux, nmap, burpsuite, Gobuster]
+tags: [web, linux, nmap, burpsuite, gobuster]
 
 level: Easy
 platform: TryHackMe
