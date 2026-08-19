@@ -6,10 +6,10 @@ image:
   path: /assets/img/posts_thumbnails/rabbit_store.png
   alt: "Rabbit Store TryHackMe"
 
-description: Exploitation of a mass assignment vulnerability to register an activated account, granting access to an API endpoint vulnerable to SSRF. Leveraging this SSRF vulnerability, we accessed the API documentation and discovered another endpoint vulnerable to SSTI, which we exploited to achieve RCE and gain a shell are the coverings of this Blog room.
+description: Exploitation of a mass assignment vulnerability to register an activated account, granting access to an API endpoint vulnerable to SSRF. Leveraging this SSRF vulnerability, we accessed the API documentation and discovered another endpoint vulnerable to SSTI, which we exploited to achieve RCE and gain a shell are the coverings of this Rabbit Store room.
 
 categories: [Web, Linux]
-tags: [web, linux, nmap, gobuster, SSRF, SSTI, JWT]
+tags: [web, linux, nmap, gobuster, burpsuite, SSRF, SSTI, JWT, RabbitMQ, erl-matter]
 
 level: Medium
 platform: TryHackMe
@@ -567,6 +567,7 @@ Each step built on the last, and it was a great exercise in real-world exploitat
  - nmap
  - gobuster
  - burpsuite
+ - netcat
 
 -----------------------------------------
 

@@ -6,7 +6,7 @@ image:
   path: /assets/img/posts_thumbnails/the_london_bridge.png
   alt: "The London Bridge TryHackMe"
 
-description: Web Enumeration, SSRF (Server-Side Request Forgery), Internal Enumeration, Finding Sensitive Files, Initial Foothold, Linux Privilege Escalation and Post-Exploitation are the coverings of this Blog room.
+description: Web Enumeration, SSRF (Server-Side Request Forgery), Internal Enumeration, Finding Sensitive Files, Initial Foothold, Linux Privilege Escalation and Post-Exploitation are the coverings of this The London Bridge room.
 
 categories: [Web, Linux]
 tags: [web, linux, nmap, gobuster, burpsuite, wfuzz, arjun, linpeas, netcat, gcc, firefox_decrypt]
