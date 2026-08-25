@@ -9,7 +9,7 @@ image:
   alt: "cupids matchmaker TryHackMe"
 
 categories: [Web, Linux]
-tags: [web, linux, nmap, burpsuite, hydra, metasploit, GTFOBins, sudo, pwn, look, elfinder]
+tags: [web, linux, nmap]
 
 level: Easy
 platform: TryHackMe
