@@ -131,4 +131,10 @@ position:relative;
   width:5rem;
   right:-20px;
  }
+ 
+ .anonymous-mask {
+  font-size: 0.12rem;
+  letter-spacing: 0.06rem;
+  margin-left: 3%;
+}
 }
