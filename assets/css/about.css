@@ -133,7 +133,7 @@ position:relative;
  }
  
  .anonymous-mask {
-  font-size: 0.16rem;
+  font-size: 0.21rem;
   letter-spacing: 0.06rem;
   overflow: auto;
   scrollbar-width: none; /* Firefox */
