@@ -5,7 +5,7 @@
  /*  color: #39ff14; */
   color: #b0b0b0;
   letter-spacing: 0.10rem;
-  margin-left:5%;
+  text-align: center;
 }
 
 .anonymous-mask::selection {
@@ -135,6 +135,5 @@ position:relative;
  .anonymous-mask {
   font-size: 0.12rem;
   letter-spacing: 0.06rem;
-  margin-left: 3%;
 }
 }
