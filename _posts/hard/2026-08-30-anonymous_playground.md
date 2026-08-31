@@ -464,4 +464,14 @@ From there I could access the final flag.
 
 ---
 
+## Tools
+ - nmap
+ - gobuster
+ - nuclei
+ - gdb (GNU Debugger)
+ 
+🖼️ **all process screenshot 1:** ![all process_1](/assets/images/writeups/anonymous_playground/all_process_1.png)
+🖼️ **all process screenshot 2:** ![all process_2](/assets/images/writeups/anonymous_playground/all_process_2.png)
+🖼️ **all process screenshot 3:** ![all process_3](/assets/images/writeups/anonymous_playground/all_process_3.png)
+
 *Thanks for reading!*
