@@ -24,7 +24,7 @@ status: complete
 
 This is a detailed walkthrough of how I rooted the **Anonymous Playground** room on TryHackMe and captured both user and root flags.
 
-The room mainly involved web enumeration, cookie manipulation, custom encryption decoding, SSH access, binary exploitation, and Linux privilege escalation through a wildcard injection in tar.
+The room mainly involved `web enumeration`, `cookie manipulation`, `custom encryption decoding`, `SSH access`, `binary exploitation`, and `Linux privilege escalation through a wildcard injection in tar`.
 
 ---
 
