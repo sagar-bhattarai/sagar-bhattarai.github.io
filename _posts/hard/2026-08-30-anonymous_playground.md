@@ -80,7 +80,7 @@ nuclei -u http://<target-ip>
 
 ## web Enumeration
 
-When I visited the website, the front page contained some names that looked interesting. I suspected that these names might be clues for obtaining access to the machine.
+When I visited the website, the index page was just wow and i just loved it and immediately put it as a part of about my protfolio and the operatives page contained some names that looked interesting. I suspected that these names might be clues for obtaining access to the machine.       
 
 ![anon](/assets/images/writeups/anonymous_playground/anon.png)
 
@@ -470,7 +470,7 @@ From there I could access the final flag.
  - nuclei
  - gdb (GNU Debugger)
  
----
+---             
  
 🖼️ **all process screenshot 1:** ![all process_1](/assets/images/writeups/anonymous_playground/all_process_1.png)
 🖼️ **all process screenshot 2:** ![all process_2](/assets/images/writeups/anonymous_playground/all_process_2.png)
