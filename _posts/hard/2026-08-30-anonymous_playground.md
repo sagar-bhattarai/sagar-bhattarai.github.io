@@ -138,7 +138,7 @@ The value was separated into two parts using:
 
 `::`
 
-For example: `hEzAdCfHzA::hEzAdCfHzAhAiJzAeIaDjBcBhHgAzAfHfN`
+For example: `hEzAdCfHzA::hEzAdCfHz <REDACTED> BcBhHgAzAfHfN`
 
 The first part appeared to be a key, while the second part appeared to contain the encrypted value.
 
