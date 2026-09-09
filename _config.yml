@@ -35,6 +35,7 @@ theme: jekyll-theme-chirpy
 markdown: kramdown
 
 kramdown:
+  input: GFM
   syntax_highlighter: rouge
   syntax_highlighter_opts:
     block:
@@ -123,9 +124,4 @@ assets:
     enabled: false
 
 compress_html:
-  clippings: all
-  comments: all
-  endings: all
-  startings: []
-  blanklines: false
-  profile: false
+  enabled: false
