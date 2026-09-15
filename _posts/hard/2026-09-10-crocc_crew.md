@@ -194,8 +194,6 @@ rdesktop -f -u "" <target-ip>
 
 The RDP session exposed information associated with the visitor account. I also tested the credentials obtained earlier from the web application's configuration file ie `db.config-bak`
 
-![rdp](/assets/images/writeups/crocc_crew/rdp.png)
-
 Trying to remotely authenticate as the guest/visitor user produced additional information.
 
 ![rdp1](/assets/images/writeups/crocc_crew/rdp1.png)
