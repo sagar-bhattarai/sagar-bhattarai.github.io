@@ -24,6 +24,12 @@ status: complete
 
 This is a detailed walkthrough of how I rooted the **Crocc Crew** room on TryHackMe and captured all the flags.
 
+Crocc Crew is a Hard-level TryHackMe room focused heavily on `web enumeration`, `Windows/Active Directory enumeration`, `SMB/RPC`, `Kerberos`, `LDAP`, and `delegation abuse`.
+
+The interesting part of this machine was that there was no single obvious path to Administrator access. Instead, several small pieces of information had to be collected and connected together.
+
+The most important lesson from this room was that enumeration had to be performed across multiple protocols. Information obtained from HTTP, RPC, RDP, SMB, LDAP and Kerberos eventually formed one attack chain.
+
 ---
 
 ## Reconnaissance
@@ -388,7 +394,416 @@ This gave me full administrative access to the machine and allowed me to retriev
 
 🖼️ **All process 2 screenshot** ![all_process_2_screenshort](/assets/images/writeups/crocc_crew/all_process_2.png)
 
+## My overall attack path was:
+
+```
+Initial Nmap Scan
+        │
+        ▼
+Web Enumeration
+        │
+        ├── robots.txt
+        │      ├── db-config.bak
+        │      │      └── Credentials
+        │      │
+        │      └── backdoor.php
+        │             └── Limited command interface
+        │
+        ▼
+SMB / RPC Enumeration
+        │
+        └── enumprivs
+               └── Delegation-related privileges
+        │
+        ▼
+RDP Enumeration
+        │
+        └── Visitor information
+               └── Valid credentials
+        │
+        ▼
+Authenticated SMB
+        │
+        ├── First flag
+        └── More domain/user enumeration
+        │
+        ▼
+Kerberos / SPN Enumeration
+        │
+        └── GetUserSPNs
+               └── Password-reset hash
+                      └── Cracked password
+        │
+        ▼
+LDAP Enumeration
+        │
+        └── Delegation configuration
+        │
+        ▼
+GetST
+        │
+        └── Impersonate Administrator
+               │
+               ▼
+        Administrator Service Ticket
+               │
+               ▼
+        secretsdump
+               │
+               ▼
+        Administrator NTLM Hash
+               │
+               ▼
+        Evil-WinRM / Remote Code Execution
+               │
+               ▼
+             ROOT / ADMIN
+```             
+
 ---
 
+
+## Why I Chose These Steps
+
+One of the biggest lessons from this machine was that I did not know the entire attack path at the beginning.
+The path developed from information discovered during enumeration.
+
+## 1. Why Nmap?
+
+I started with Nmap because I needed to identify the exposed attack surface.
+The combination of:
+
+- HTTP
+- SMB
+- LDAP
+- Kerberos
+- RDP
+- WinRM
+
+told me that I should investigate both the web application and Active Directory.
+
+## 2. Why Gobuster?
+
+Once HTTP was identified, directory/content discovery was a logical next step.
+I was looking for:
+
+- Hidden directories
+- Backup files
+- Configuration files
+- Admin panels
+- Development files
+- Old endpoints
+
+This led to:
+
+- robots.txt
+- db-config.bak
+- backdoor.php
+
+The backup configuration file then provided credentials.
+
+## 3. Why investigate the fake terminal?
+
+Because backdoor.php looked like a potential command-execution mechanism.
+However, testing commands showed that it was not behaving like a real shell.
+That forced me to investigate the application's implementation rather than assuming it was OS command execution.
+The important lesson was:
+
+`Always verify what a discovered endpoint actually does.`
+
+##  4. Why RPC?
+
+Port 445/139 and RPC are extremely important in Windows environments.
+The null RPC session initially appeared restrictive, but enumprivs exposed something very interesting:
+
+- SeEnableDelegationPrivilege
+- SeDelegateSessionUserImpersonatePrivilege
+
+That gave me a delegation clue.
+I did not immediately exploit it because I still needed to understand the Active Directory configuration.
+
+## 5. Why RDP?
+
+RDP was another exposed Windows service.
+The session provided information about the visitor account and, more importantly, a username clue.
+That information helped bridge the gap between:
+
+```
+Unauthenticated enumeration
+          ↓
+Known username
+          ↓
+Credential validation
+          ↓
+Authenticated enumeration
+```
+
+## 6. Why SMB?
+
+Once valid credentials were discovered, SMB became one of the most useful services.
+Authenticated SMB allowed me to:
+
+- Enumerate shares
+- Access the Home share
+- Retrieve a flag
+- Perform deeper Windows enumeration
+- Confirm authentication
+
+## 7. Why enum4linux-ng?
+
+After obtaining credentials, I wanted to stop relying only on unauthenticated enumeration.
+enum4linux-ng is useful for gathering Windows/SMB/domain information such as:
+
+- Users
+- Groups
+- Shares
+- Domain information
+- Policy information
+
+This gave me additional identities to investigate.
+
+## 8. Why GetUserSPNs?
+
+Because the target was clearly an Active Directory environment and I had valid domain credentials.
+SPN enumeration is a logical next step because service accounts associated with SPNs can sometimes be attacked through Kerberoasting.
+In this machine, that produced a crackable credential.
+
+## 9. Why LDAP?
+
+LDAP provides a much deeper view of Active Directory.
+At this point, I was specifically interested in:
+
+- Delegation
+- Users
+- Computer accounts
+- SPNs
+- Relationships
+- AD attributes
+
+This connected my earlier RPC discovery with the actual AD configuration.
+
+## 10. Why GetST?
+
+Once constrained delegation was identified, getST was the natural tool for abusing that configuration.
+
+The goal became:
+
+```
+Compromised delegated account
+          ↓
+Request service ticket
+          ↓
+Impersonate Administrator
+          ↓
+Obtain Administrator service ticket
+```
+
+This was the key privilege-escalation step.
+
+## Other Possible Paths
+
+The route I followed was not necessarily the only route.
+
+A useful way to think about this machine is:
+
+```
+                 ┌── Web
+                 │
+                 ├── RDP
+Recon ───────────┼── SMB/RPC
+                 │
+                 ├── LDAP
+                 │
+                 └── Kerberos
+```
+
+Different branches could potentially reveal overlapping information.
+
+## Alternative Path 1 — Web → Credentials → SMB
+
+The simplest early path was:
+
+```
+HTTP
+ ↓
+robots.txt
+ ↓
+db-config.bak
+ ↓
+Credentials
+ ↓
+SMB
+ ↓
+Home share
+```
+
+This was useful because the leaked configuration immediately provided authentication material.
+
+## Alternative Path 2 — SMB → RPC → Delegation
+
+Another possible investigation was:
+
+```
+445
+ ↓
+RPC
+ ↓
+enumprivs
+ ↓
+Delegation-related privileges
+ ↓
+LDAP
+ ↓
+Delegation configuration
+ ↓
+Kerberos
+```
+
+This path focuses much more heavily on the Active Directory side of the machine.
+
+## Alternative Path 3 — SMB → User Enumeration → Kerberos
+
+After obtaining SMB credentials:
+
+```
+SMB
+ ↓
+enum4linux-ng
+ ↓
+Users
+ ↓
+Kerberos
+ ↓
+GetUserSPNs
+ ↓
+Kerberoasting
+ ↓
+Password
+```
+
+This was the branch that ultimately gave me credentials useful for deeper AD enumeration.
+
+## Alternative Path 4 — LDAP First
+
+Once valid domain credentials were obtained, LDAP could be prioritized earlier:
+
+```
+Valid credentials
+       ↓
+LDAP
+       ↓
+Users / Groups / Computers
+       ↓
+SPNs
+       ↓
+Delegation
+       ↓
+Kerberos abuse
+```
+
+This can sometimes be more efficient than running many separate enumeration tools without a specific hypothesis.
+
+## Alternative Path 5 — WinRM
+
+Because WinRM was exposed, I kept it in mind throughout the enumeration. The important distinction is:
+
+` WinRM exposed ≠ WinRM exploitable `
+
+You still need valid credentials or another authentication mechanism with sufficient privileges. Once Administrator credentials were recovered, WinRM became the final access method:
+
+```
+Administrator hash
+       ↓
+evil-winrm
+       ↓
+Administrator shell
+
+```
+## What I Learned
+
+Technical lessons
+
+- Always perform a full port scan.
+- Do not focus exclusively on the web application.
+- robots.txt can reveal interesting files.
+- Backup files such as .bak can expose credentials.
+- A browser-based terminal may be application logic rather than a real shell.
+- SMB/RPC enumeration is extremely valuable in Windows environments.
+- Authenticated enumeration is often much more powerful than anonymous enumeration.
+- enum4linux-ng is useful after obtaining credentials.
+- SPNs are important in Active Directory enumeration.
+- Kerberoasting can expose service-account credentials.
+- LDAP can reveal critical AD relationships and configuration.
+- Delegation is an important privilege-escalation concept.
+- Kerberos tickets can sometimes be abused to impersonate higher-privileged users.
+- WinRM is particularly useful once valid administrative credentials are obtained.
+
+## Enumeration mindset
+
+The biggest lesson from Crocc Crew was:
+
+`When one path stops working, don't immediately assume the machine is impossible. Go back to enumeration and look at the information from another service.`
+
+My attack was not:
+
+` Find vulnerability → exploit → root `
+
+It was closer to:
+
+```
+Find information
+      ↓
+Validate information
+      ↓
+Use it against another service
+      ↓
+Collect more information
+      ↓
+Connect the clues
+      ↓
+Identify AD weakness
+      ↓
+Abuse delegation
+      ↓
+Impersonate Administrator
+      ↓
+Obtain privileged credentials
+      ↓
+Administrator access
+```
+
+That is what made this room particularly useful for learning real-world Active Directory enumeration and attack-chain thinking.
+
+## Conclusion
+
+Crocc Crew demonstrated how a seemingly simple web application can become the starting point for a much larger Active Directory attack chain.
+
+The final path was:
+
+```
+Web Enumeration
+      ↓
+Credential Discovery
+      ↓
+RDP / SMB Enumeration
+      ↓
+Authenticated Enumeration
+      ↓
+Kerberoasting
+      ↓
+LDAP Enumeration
+      ↓
+Constrained Delegation
+      ↓
+Administrator Impersonation
+      ↓
+Kerberos Ticket
+      ↓
+Credential Dumping
+      ↓
+Administrator Access
+
+```
+The most important takeaway for me was not a particular tool or command, but learning how to connect individual enumeration findings into one attack chain.
 
 *Thanks for reading!*
