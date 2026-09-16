@@ -5,7 +5,7 @@ date: 2026-09-10 10:20:30 +0545
 description: A detailed walkthrough of the Crocc Crew TryHackMe room, covering web enumeration, SMB/RPC enumeration, Kerberos attacks, constrained delegation, ticket impersonation, and Administrator access.
 
 categories: [Web, Linux]
-tags: [web, linux, nmap, smb, rpcclient, ldap, kerberos, active-directory, constrained-delegation, impacket]
+tags: [web, linux, nmap, smb, rpcclient, ldap, kerberos, active-directory, constrained-delegation, impacket, enum4linux, winRM]
 
 image:
   path: /assets/img/posts_thumbnails/crocc_crew.png
