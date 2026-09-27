@@ -129,14 +129,7 @@ I also inspected the source code.
 
 At this point, there were already multiple possible attack directions:
 
-```text
-XSS
-File Upload
-Authentication attacks
-Parameter manipulation
-Hidden endpoints
-Credential attacks
-```
+`XSS`, `File Upload`, `Authentication attacks`, `Parameter manipulation`, `Hidden endpoints`, `Credential attacks`
 
 Instead of immediately attacking every form randomly, I continued enumerating the application.
 
@@ -154,11 +147,7 @@ ffuf -u http://<target-ip>/FUZZ \
 
 ![ffuf on IP only](/assets/images/writeups/the_great_disappearing_act/3.png)
 
-The main interesting discovery was:
-
-```text
-/cgi-bin
-```
+The main interesting discovery was `/cgi-bin`
 
 I then performed another fuzzing scan against port `8000`.
 
@@ -186,17 +175,17 @@ This turned out to be important.
 
 The posts appeared to contain clues related to credentials.
 
-One account caught my attention:
+One account caught my attention ie `guard.hopkins@hopsecasylum.com`
 
-```text
-guard.hopkins@hopsecasylum.com
-```
+![email](/assets/images/writeups/the_great_disappearing_act/email.png)
 
 A post appeared to reveal information about the user's password through social engineering.
 
 The account had subsequently changed its password.
 
 That meant the original password was probably not directly usable.
+
+![password change](/assets/images/writeups/the_great_disappearing_act/pw_change.png)
 
 However, the posts gave me several words and pieces of information that could potentially be used to construct the new password.
 
@@ -206,11 +195,7 @@ However, the posts gave me several words and pieces of information that could po
 
 # 7. Building a Password Wordlist
 
-I collected the interesting words from the Fakebook posts and placed them into:
-
-```text
-list_a.txt
-```
+I collected the interesting words from the Fakebook posts and placed them into `list_a.txt`
 
 I then duplicated the list:
 
@@ -228,11 +213,7 @@ hashcat --stdout -a 1 list_a list_b > passwords.txt
 
 ### What is happening here?
 
-The important part is:
-
-```text
--a 1
-```
+The important part is `-a 1`
 
 Hashcat attack mode `1` is the **combinator attack**.
 
@@ -262,11 +243,7 @@ word3word2
 word3word3
 ```
 
-The generated combinations were saved to:
-
-```text
-passwords.txt
-```
+The generated combinations were saved to `passwords.txt`
 
 ![passwords generated using hashcat](/assets/images/writeups/the_great_disappearing_act/3_3.png)
 
@@ -278,13 +255,9 @@ This was a useful example of how OSINT can be converted into a targeted password
 
 Now I had:
 
-```text
-Username:
-guard.hopkins@hopsecasylum.com
+`Username: guard.hopkins@hopsecasylum.com`
 
-Password candidates:
-passwords.txt
-```
+`Password candidates: passwords.txt`
 
 I used Hydra against the login endpoint:
 
@@ -392,11 +365,7 @@ I reused the credentials against the video portal on port `13400`.
 
 The portal contained four videos.
 
-Three of the videos displayed a message indicating that I had been:
-
-```text
-JESTERED
-```
+Three of the videos displayed a message indicating that I had been `JESTERED`
 
 ![video portal jestered](/assets/images/writeups/the_great_disappearing_act/4_1.png)
 
@@ -416,11 +385,7 @@ I opened Burp Suite and intercepted the request generated when selecting the cam
 
 ![cam lobby](/assets/images/writeups/the_great_disappearing_act/4_3.png)
 
-After forwarding the request, another request was generated:
-
-```text
-/v1/streams/request
-```
+After forwarding the request, another request was generated `/v1/streams/request`
 
 The request used POST and contained information identifying the camera and its tier.
 
@@ -428,23 +393,13 @@ The request used POST and contained information identifying the camera and its t
 
 This was an important discovery.
 
-Instead of the browser simply requesting:
-
-```text
-"give me camera X"
-```
-
-the application was sending parameters that determined the camera and access tier.
+Instead of the browser simply requesting `give me camera X` and the application was sending parameters that determined the camera and access tier.
 
 ---
 
 # 13. Accessing the Admin Camera
 
-While examining the camera interface, I noticed a camera identifier:
-
-```text
-cam-admin
-```
+While examining the camera interface, I noticed a camera identifier `cam-admin`
 
 I modified the request to request the admin camera.
 
@@ -490,11 +445,7 @@ This produced the first half of the second flag.
 
 At this point, I had:
 
-```text
-FLAG 1
-    +
-Second flag — first half
-```
+`FLAG 1   +    Second flag — first half`
 
 But the second half still needed to be recovered.
 
@@ -508,21 +459,15 @@ The returned `manifest.m3u8` file contained several interesting references.
 
 Most importantly, it exposed:
 
-```text
-/v1/ingest/diagnostics
-```
+`/v1/ingest/diagnostics`
 
 and:
 
-```text
-/v1/ingest/jobs
-```
+`/v1/ingest/jobs`
 
 It also contained an example RTSP URL:
 
-```text
-rtsp://vendor-cam.test/cam-admin
-```
+`rtsp://vendor-cam.test/cam-admin`
 
 The relevant entries were:
 
@@ -544,11 +489,7 @@ The video manifest was exposing internal API functionality.
 
 # 17. Investigating `/v1/ingest/diagnostics`
 
-I checked:
-
-```text
-/v1/ingest/diagnostics
-```
+I checked `/v1/ingest/diagnostics`
 
 A normal GET request was not accepted.
 
@@ -564,37 +505,23 @@ When I sent the request without the required data, the server complained about a
 
 ![invalid rtsp_url](/assets/images/writeups/the_great_disappearing_act/5_2.png)
 
-This error message gave me exactly what I needed:
-
-```text
-rtsp_url
-```
+This error message gave me exactly what I needed `rtsp_url`
 
 ---
 
 # 18. Supplying the RTSP URL
 
-The manifest had already exposed an example RTSP URL:
-
-```text
-rtsp://vendor-cam.test/cam-admin
-```
+The manifest had already exposed an example RTSP URL `rtsp://vendor-cam.test/cam-admin`
 
 I supplied this value to the diagnostics endpoint.
 
 The server responded with a `job_id`.
 
-Example:
-
-```text
-fd086e09-1fc3-4b0c-8acc-6d034208adfe
-```
+Example: `fd086e09-1fc3-4b0c-8acc-6d034208adfe`
 
 The response referenced another endpoint:
 
-```http
-GET /v1/ingest/jobs/fd086e09-1fc3-4b0c-8acc-6d034208adfe
-```
+`GET /v1/ingest/jobs/fd086e09-1fc3-4b0c-8acc-6d034208adfe`
 
 ![job_id](/assets/images/writeups/the_great_disappearing_act/5_3.png)
 
@@ -614,19 +541,11 @@ job_id
 
 # 19. Obtaining the Token
 
-I requested the job endpoint:
-
-```text
-/v1/ingest/jobs/<job_id>
-```
+I requested the job endpoint `/v1/ingest/jobs/<job_id>`
 
 The response contained a token.
 
-It also referenced port:
-
-```text
-13404
-```
+It also referenced port `13404`
 
 ![token](/assets/images/writeups/the_great_disappearing_act/5_4.png)
 
@@ -644,11 +563,7 @@ nc <target-ip> 13404
 
 I supplied the token obtained from the API.
 
-This resulted in shell access as:
-
-```text
-svc_vidops
-```
+This resulted in shell access as `svc_vidops`
 
 ![nc and second half of the flag](/assets/images/writeups/the_great_disappearing_act/5_5.png)
 
@@ -694,11 +609,7 @@ find / -type f -perm /4000 2>/dev/null
 
 ![SUID](/assets/images/writeups/the_great_disappearing_act/6_1.png)
 
-One interesting binary was:
-
-```text
-/usr/local/bin/diag_shell
-```
+One interesting binary was `/usr/local/bin/diag_shell`
 
 It was owned by the `dockermgr` user.
 
@@ -714,11 +625,7 @@ ls -la /usr/local/bin/diag_shell
 
 ![diag_shell](/assets/images/writeups/the_great_disappearing_act/6_2.png)
 
-Executing the binary spawned a shell with the UID of:
-
-```text
-dockermgr
-```
+Executing the binary spawned a shell with the UID of `dockermgr`
 
 However, simply obtaining the UID was not enough.
 
@@ -726,11 +633,7 @@ I was not actually a member of the `dockermgr` group, so I could not immediately
 
 This is where filesystem permissions became important.
 
-I discovered that I could write to the home directory belonging to:
-
-```text
-dockermgr
-```
+I discovered that I could write to the home directory belonging to `dockermgr`
 
 That gave me another way to obtain a proper session as that user.
 
@@ -752,11 +655,7 @@ cat id_ed25519.pub
 
 ![ssh-keygen](/assets/images/writeups/the_great_disappearing_act/6_3.png)
 
-I placed my public key inside:
-
-```text
-/home/dockermgr/.ssh/authorized_keys
-```
+I placed my public key inside `/home/dockermgr/.ssh/authorized_keys`
 
 For example:
 
@@ -775,11 +674,7 @@ ssh -i id_ed25519 dockermgr@<target-ip>
 
 ![ssh-login](/assets/images/writeups/the_great_disappearing_act/6_5.png)
 
-This provided a stable session as:
-
-```text
-dockermgr
-```
+This provided a stable session as `dockermgr`
 
 ---
 
@@ -795,17 +690,7 @@ One container immediately stood out.
 
 It was responsible for the SCADA terminal controlling the exit gate.
 
-The container was named:
-
-```text
-asylum_gate_control
-```
-
-Its container ID was:
-
-```text
-a20f81c6cc55
-```
+The container was named `asylum_gate_control`. Its container ID was `a20f81c6cc55`
 
 ---
 
@@ -825,11 +710,7 @@ ls
 
 ![docker ps, exec](/assets/images/writeups/the_great_disappearing_act/6_6.png)
 
-One particularly interesting file was:
-
-```text
-scada_terminal.py
-```
+One particularly interesting file was `scada_terminal.py`
 
 I examined it:
 
@@ -891,11 +772,7 @@ The application then provided another flag/access code.
 
 ![access flag](/assets/images/writeups/the_great_disappearing_act/6_11.png)
 
-The page also provided an invitation to:
-
-```text
-Hoppers Origins Side Side Quest
-```
+The page also provided an invitation to `Hoppers Origins Side Side Quest`
 
 ![invite page](/assets/images/writeups/the_great_disappearing_act/6_12.png)
 
