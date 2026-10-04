@@ -5,7 +5,7 @@ date: 2026-09-16 10:47:35 +0545
 description: "It is a hard-level binary exploitation/reverse-engineering room from the TryHackMe Advent of Cyber Side Quest. where i investigate a suspicious binary, reverse-engineer its authentication and network behavior, and then exploit vulnerabilities to progress through multiple stages."
 
 categories: [Web, Linux ]
-tags: [web, linux, nmap, gobuster, reverse-engineering, heap-exploitation, UAF, Docker, kernel-exploitation]
+tags: [web, linux, nmap, gobuster, reverse-engineering, heap-exploitation, UAF, docker, kernel-exploitation]
 
 image:
   path: /assets/img/posts_thumbnails/scheme_catcher.png

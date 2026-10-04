@@ -5,7 +5,7 @@ date: 2026-09-27 11:11:12 +0545
 description: "Web enumeration, TYPO3 exploitation, PHP deserialization, reverse shells, shared-library hijacking, cron jobs, SSH key injection, and NFS no_root_squash privilege escalation are the covering of this EnterPrize Hard-level TryHackMe Linux and web exploitation room."
 
 categories: [Web, Linux]
-tags: [web, linux, nmap, ffuf, gobuster, typo3, php, deserialization, phpggc, guzzle, docker, reverse-shell, cron, ssh, nfs, privesc]
+tags: [web, linux, nmap, ffuf, gobuster, typo3, burpsuite, deserialization, phpggc, guzzle, docker, cronjob, nfs, linpeas, port-forwarding]
 image:
   path: /assets/img/posts_thumbnails/enterprize.png
   alt: "EnterPrize"
