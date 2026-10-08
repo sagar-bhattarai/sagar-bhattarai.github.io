@@ -1372,3 +1372,5 @@ The machine also reinforced the importance of:
 - Using stable access methods such as SSH keys when possible.
 
 Overall, **EnterPrize** was a great exercise in chaining web exploitation with Linux privilege escalation.
+
+*Thanks for reading!*
