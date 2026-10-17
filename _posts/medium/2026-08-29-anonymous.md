@@ -52,7 +52,7 @@ I decided to analyze the output of nmap maybe so that i might be lucky and find 
 There wa NetBios/smb running so i tried to figure what shares are present where i got the answer of this question `There's a share on the user's computer.  What's it called?`.
 
 ```bash
-smbclient <target-ip> -U <username>
+smbclient -L <target-ip> -U <username>
 ```
 ![smb](/assets/images/writeups/anonymous/2.png)
 

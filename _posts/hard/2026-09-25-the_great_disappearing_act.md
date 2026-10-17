@@ -5,7 +5,7 @@ date: 2026-09-25 10:11:12 +0545
 description: "The Great Disappearing Act room covering web enumeration, OSINT, password generation, brute-force authentication, API manipulation, RTSP abuse, shell access, SUID privilege escalation, Docker enumeration, and SCADA access."
 
 categories: [Web, Linux]
-tags: [web, linux, nmap, ffuf, hash-cat, hydra, burpsuite, api, rtsp, docker, osint]
+tags: [web, linux, nmap, ffuf, hashcat, hydra, burpsuite, api, rtsp, docker, osint]
 
 image:
   path: /assets/img/posts_thumbnails/the_great_disappearing_act.png
