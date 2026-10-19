@@ -6,7 +6,7 @@ description: "Exploring how malformed input can trigger verbose error messages a
 
 categories: [PortSwigger, Information Disclosure]
 image:
-  path: /assets/img/posts_thumbnails/portswigger/information_disclosure.webp
+  path: /assets/img/posts_thumbnails/portswigger/in_error_messages.png
   alt: "Information Disclosure in Error Messages - PortSwigger Web Security Academy"
 
 platform: PortSwigger
