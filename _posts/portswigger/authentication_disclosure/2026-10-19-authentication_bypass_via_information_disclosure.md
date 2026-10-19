@@ -77,7 +77,7 @@ An error does not automatically indicate a vulnerability, but it can provide a u
 
 ## 5. Discovering the /admin Endpoint
 
-To identify additional endpoints, I reused the content-discovery technique I had practised in my previous write-up, `Source Code Disclosure via Backup Files`, specifically Steps 3 and 4.
+To identify additional endpoints, I reused the content-discovery technique I had practised in my previous write-up, [Source Code Disclosure via Backup Files](https://sagar-bhattarai.github.io/portswigger/information%20disclosure/2026/10/19/source_code_disclosure_via_backup_files.html), specifically Steps 3 and 4.
 
 Using Burp Suite's Discover content feature, I performed content discovery against the lab application and examined the results in the site map.
 
