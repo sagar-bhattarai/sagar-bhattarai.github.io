@@ -8,7 +8,7 @@ categories: [PortSwigger, Information Disclosure]
 tags: [burpsuite]
 
 image:
-  path: /assets/img/posts_thumbnails/portswigger/scdvbf.png
+  path: /assets/img/posts_thumbnails/portswigger/information_disclosure/scdvbf.png
   alt: "Source Code Disclosure via Backup Files - PortSwigger"
 
 platform: PortSwigger
@@ -26,7 +26,7 @@ This lab demonstrates how publicly accessible backup files can expose an applica
 
 The objective was to discover the leaked source code and retrieve the database password hard-coded within it.
 
-![Lab question](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/1.png)
+![Lab question](/assets/images/writeups/portswigger/information_disclosure/scdvbf/1.png)
 
 # Walkthrough
 
@@ -34,7 +34,7 @@ The objective was to discover the leaked source code and retrieve the database p
 
 After launching the lab, I accessed the target application and explored its available functionality. The website displayed a list of products, with individual product pages accessible through the interface.
 
-![Initial application page](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/2.png)
+![Initial application page](/assets/images/writeups/portswigger/information_disclosure/scdvbf/2.png)
 
 I browsed the application to understand its structure and identify potential entry points for further investigation.
 
@@ -42,7 +42,7 @@ I browsed the application to understand its structure and identify potential ent
 
 I selected one of the products to examine its details.
 
-![Product details page](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/3.png)
+![Product details page](/assets/images/writeups/portswigger/information_disclosure/scdvbf/3.png)
 
 While inspecting the page, I observed that the URL contained a `productId` parameter used to identify the selected product.
 
@@ -66,11 +66,11 @@ The steps were:
 6. Switch to the **Control** tab.
 7. Start the content discovery session using the available control button and confirm the prompt if required.
 
-![Burp Suite Engagement tools - Discover content](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/4.png)
+![Burp Suite Engagement tools - Discover content](/assets/images/writeups/portswigger/information_disclosure/scdvbf/4.png)
 
-![Burp Suite Discover content configuration](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/4_1.png)
+![Burp Suite Discover content configuration](/assets/images/writeups/portswigger/information_disclosure/scdvbf/4_1.png)
 
-![Burp Suite Discover content control tab](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/4_2.png)
+![Burp Suite Discover content control tab](/assets/images/writeups/portswigger/information_disclosure/scdvbf/4_2.png)
 
 **Why this matters:** Content discovery tests for commonly named files and directories that may not be linked from the website. Depending on the configured wordlists and extensions, it can identify exposed backups, configuration files, and other potentially sensitive resources.
 
@@ -80,7 +80,7 @@ After running content discovery, I returned to Burp Suite's **Target → Site ma
 
 I noticed a new directory named `/backup` in the site's structure.
 
-![Discovered backup directory](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/5.png)
+![Discovered backup directory](/assets/images/writeups/portswigger/information_disclosure/scdvbf/5.png)
 
 This was an important finding because backup directories can contain older copies of application files. If those files are accessible over HTTP, they may expose source code or information that should remain private.
 
@@ -94,7 +94,7 @@ Inside, I found a backup file named:
 
 `ProductTemplate.java.bak`
 
-![Discovered Java backup file](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/6.png)
+![Discovered Java backup file](/assets/images/writeups/portswigger/information_disclosure/scdvbf/6.png)
 
 The `.java` extension indicated that the file contained Java source code, while the `.bak` suffix suggested that it was a backup copy.
 
@@ -104,7 +104,7 @@ Backup files are often overlooked during deployment. If a web server serves them
 
 I opened `ProductTemplate.java.bak` and inspected the source code.
 
-![Leaked source code showing ConnectionBuilder](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/7.png)
+![Leaked source code showing ConnectionBuilder](/assets/images/writeups/portswigger/information_disclosure/scdvbf/7.png)
 
 While reviewing the code, I found a `ConnectionBuilder` component containing database connection configuration. Within this configuration, I identified the hard-coded database password required by the lab.
 
@@ -116,7 +116,7 @@ This confirmed that the exposed backup file was more than an unnecessary leftove
 
 After locating the database password, I copied its value and submitted it through the lab's answer field.
 
-![Submitting the discovered database password](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/8.png)
+![Submitting the discovered database password](/assets/images/writeups/portswigger/information_disclosure/scdvbf/8.png)
 
 The application accepted the submitted value, confirming that I had successfully retrieved the requested credential.
 
@@ -124,7 +124,7 @@ The application accepted the submitted value, confirming that I had successfully
 
 After submitting the correct password, the lab displayed the completion confirmation.
 
-![Lab solved confirmation](/assets/images/writeups/portswigger/authentication_disclosure/scdvbf/9.png)
+![Lab solved confirmation](/assets/images/writeups/portswigger/information_disclosure/scdvbf/9.png)
 
 This confirmed that I had successfully exploited the information disclosure caused by the publicly accessible source code backup.
 

@@ -6,7 +6,7 @@ description: "Exploring how malformed input can trigger verbose error messages a
 
 categories: [PortSwigger, Information Disclosure]
 image:
-  path: /assets/img/posts_thumbnails/portswigger/in_error_messages.png
+  path: /assets/img/posts_thumbnails/portswigger/information_disclosure/in_error_messages.png
   alt: "Information Disclosure in Error Messages - PortSwigger Web Security Academy"
 
 platform: PortSwigger
@@ -28,7 +28,7 @@ The information obtained from the error message was sufficient to solve the lab 
 
 After accessing the lab, I was presented with a simple web application displaying a list of products. There were no immediately obvious features beyond viewing individual product details.
 
-![Initial application page](/assets/images/writeups/portswigger/authentication_disclosure/idiem/2.png)
+![Initial application page](/assets/images/writeups/portswigger/information_disclosure/idiem/2.png)
 
 I began by exploring the available functionality to identify potential entry points for testing.
 
@@ -36,7 +36,7 @@ I began by exploring the available functionality to identify potential entry poi
 
 I selected one of the products to view its details.
 
-![Product details page](/assets/images/writeups/portswigger/authentication_disclosure/idiem/3.png)
+![Product details page](/assets/images/writeups/portswigger/information_disclosure/idiem/3.png)
 
 While examining the page, I noticed that the URL contained a parameter named `productId`, which appeared to identify the selected product.
 
@@ -48,7 +48,7 @@ I first changed the `productId` value several times, incrementing the number to 
 
 I then tried a larger integer, such as `100`, to observe how the application handled a product that did not exist.
 
-![Testing a large product identifier](/assets/images/writeups/portswigger/authentication_disclosure/idiem/4.png)
+![Testing a large product identifier](/assets/images/writeups/portswigger/information_disclosure/idiem/4.png)
 
 The application returned a product-not-found message. This showed that the application handled the supplied identifier differently depending on whether a matching product existed.
 
@@ -60,7 +60,7 @@ Instead of supplying a number, I replaced the parameter value with a string such
 
 This time, the application returned a detailed error message rather than the usual product response.
 
-![Error message after supplying a string](/assets/images/writeups/portswigger/authentication_disclosure/idiem/5.png)
+![Error message after supplying a string](/assets/images/writeups/portswigger/information_disclosure/idiem/5.png)
 
 The error message disclosed information about the application's backend technology, including **Apache Struts and its version**.
 
@@ -70,7 +70,7 @@ This was the key finding in the lab. The application exposed internal implementa
 
 After identifying the version in the error message, I submitted it in the lab's answer field.
 
-![Submitting the identified version](/assets/images/writeups/portswigger/authentication_disclosure/idiem/6.png)
+![Submitting the identified version](/assets/images/writeups/portswigger/information_disclosure/idiem/6.png)
 
 The answer was accepted, confirming that I had identified the requested information correctly.
 
@@ -78,7 +78,7 @@ The answer was accepted, confirming that I had identified the requested informat
 
 After submitting the correct answer, I was redirected to the lab completion page, confirming that the challenge had been solved successfully.
 
-![Lab solved confirmation](/assets/images/writeups/portswigger/authentication_disclosure/idiem/7.png)
+![Lab solved confirmation](/assets/images/writeups/portswigger/information_disclosure/idiem/7.png)
 
 # Key Takeaways
 

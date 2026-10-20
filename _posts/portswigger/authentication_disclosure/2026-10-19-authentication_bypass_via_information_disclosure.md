@@ -8,7 +8,7 @@ categories: [PortSwigger, Information Disclosure]
 tags: [burpsuite, TRACE method, custom-header]
 
 image:
-  path: /assets/img/posts_thumbnails/portswigger/abvid.png
+  path: /assets/img/posts_thumbnails/portswigger/information_disclosure/abvid.png
   alt: "Authentication Bypass via Information Disclosure - PortSwigger"
 
 platform: PortSwigger
@@ -26,7 +26,7 @@ This lab demonstrates how information disclosure can reveal an internal access-c
 
 The objective was to bypass the application's access restrictions, access the administrative interface, and delete the user `carlos`.
 
-![Lab question](/assets/images/writeups/portswigger/authentication_disclosure/abvid/1.png)
+![Lab question](/assets/images/writeups/portswigger/information_disclosure/abvid/1.png)
 
 # Walkthrough
 
@@ -34,7 +34,7 @@ The objective was to bypass the application's access restrictions, access the ad
 
 After launching the lab, I accessed the target application and explored its available functionality. The website displayed a list of products, individual product pages, and a **My Account** option.
 
-![Initial application page](/assets/images/writeups/portswigger/authentication_disclosure/abvid/2.png)
+![Initial application page](/assets/images/writeups/portswigger/information_disclosure/abvid/2.png)
 
 I browsed the application to understand its structure and identify the available entry points before investigating the authentication mechanism.
 
@@ -42,7 +42,7 @@ I browsed the application to understand its structure and identify the available
 
 I clicked **My Account**, which redirected me to the login page.
 
-![Login page](/assets/images/writeups/portswigger/authentication_disclosure/abvid/3.png)
+![Login page](/assets/images/writeups/portswigger/information_disclosure/abvid/3.png)
 
 I entered the credentials provided by the lab and submitted the login form. After successfully logging in, I was redirected to my account page.
 
@@ -50,7 +50,7 @@ I entered the credentials provided by the lab and submitted the login form. Afte
 
 After logging in, I found an account page containing a form for updating my email address.
 
-![Account dashboard](/assets/images/writeups/portswigger/authentication_disclosure/abvid/4.png)
+![Account dashboard](/assets/images/writeups/portswigger/information_disclosure/abvid/4.png)
 
 Initially, I was confused about how an email-update form could help me bypass authentication or reach the admin panel. I was focusing on the visible functionality rather than the underlying access-control mechanism.
 
@@ -69,7 +69,7 @@ Instead of continuing to focus on the email-update form, I decided to investigat
 
 While exploring the account functionality, I encountered an error when accessing the relevant account URL.
 
-![Error encountered on the account URL](/assets/images/writeups/portswigger/authentication_disclosure/abvid/5.png)
+![Error encountered on the account URL](/assets/images/writeups/portswigger/information_disclosure/abvid/5.png)
 
 This made me reconsider my approach. Rather than repeatedly interacting with the same page, I decided to examine the application's HTTP requests and responses using Burp Suite.
 
@@ -83,7 +83,7 @@ Using Burp Suite's Discover content feature, I performed content discovery again
 
 During this process, I discovered the `/admin` endpoint.
 
-![/admin](/assets/images/writeups/portswigger/authentication_disclosure/abvid/admin.png)
+![/admin](/assets/images/writeups/portswigger/information_disclosure/abvid/admin.png)
 
 This was an important finding because administrative endpoints may expose privileged functionality and should be investigated to understand how access is controlled.
 
@@ -93,7 +93,7 @@ Discovering an endpoint does not automatically mean that it is vulnerable. The n
 
 I opened Burp Suite and used its built-in browser to access the lab. I captured a request to the application and sent it to **Repeater**.
 
-![Sending the request to Burp Suite Repeater](/assets/images/writeups/portswigger/authentication_disclosure/abvid/6.png)
+![Sending the request to Burp Suite Repeater](/assets/images/writeups/portswigger/information_disclosure/abvid/6.png)
 
 Repeater allowed me to modify individual HTTP requests, send them to the server, and compare the responses without repeatedly navigating through the browser.
 
@@ -107,7 +107,7 @@ The `TRACE` method is intended for diagnostic purposes. A server that supports i
 
 I changed the HTTP method of the captured request to `TRACE` and examined the response.
 
-![TRACE method revealing X-Custom-IP-Authorization](/assets/images/writeups/portswigger/authentication_disclosure/abvid/6_1.png)
+![TRACE method revealing X-Custom-IP-Authorization](/assets/images/writeups/portswigger/information_disclosure/abvid/6_1.png)
 
 The response revealed a header named:
 
@@ -171,7 +171,7 @@ The steps were:
 5. Leave the match field empty if the selected rule type and Burp Suite version support adding a header this way. Otherwise, configure the rule according to the displayed matching options.
 6. Save the rule and verify that the header appears in outgoing requests.
 
-![Burp Suite Match and Replace configuration](/assets/images/writeups/portswigger/authentication_disclosure/abvid/6_2.png)
+![Burp Suite Match and Replace configuration](/assets/images/writeups/portswigger/information_disclosure/abvid/6_2.png)
 
 After enabling the rule, Burp Suite could automatically modify matching requests sent through the proxy.
 
@@ -203,7 +203,7 @@ I then accessed the administrative path:
 
 Without the custom header, I could not access the admin panel.
 
-![Testing /admin without the modified header](/assets/images/writeups/portswigger/authentication_disclosure/abvid/7.png)
+![Testing /admin without the modified header](/assets/images/writeups/portswigger/information_disclosure/abvid/7.png)
 
 This established a useful baseline. The administrative resource was restricted under the normal request conditions.
 
@@ -219,7 +219,7 @@ This time, the request included:
 
 The application allowed me to access the administrative interface, where I could see the available user-management functionality.
 
-![Admin dashboard showing the user accounts](/assets/images/writeups/portswigger/authentication_disclosure/abvid/7_1.png)
+![Admin dashboard showing the user accounts](/assets/images/writeups/portswigger/information_disclosure/abvid/7_1.png)
 
 The result confirmed the hypothesis: the application trusted the custom header when deciding whether to grant access to the admin panel.
 
@@ -229,7 +229,7 @@ This was the authentication-bypass technique demonstrated by the lab. More preci
 
 After reaching the admin panel, I located the user `carlos` and used the available delete functionality.
 
-![Deleting the user carlos and lab completion confirmation](/assets/images/writeups/portswigger/authentication_disclosure/abvid/7_3.png)
+![Deleting the user carlos and lab completion confirmation](/assets/images/writeups/portswigger/information_disclosure/abvid/7_3.png)
 
 The lab displayed its completion confirmation after the required action was completed.
 

@@ -8,7 +8,7 @@ categories: [PortSwigger, Information Disclosure]
 tags: [burpsuite]
 
 image:
-  path: /assets/img/posts_thumbnails/portswigger/on_debug_page.png
+  path: /assets/img/posts_thumbnails/portswigger/information_disclosure/on_debug_page.png
   alt: "Information Disclosure on Debug Page - PortSwigger"
 
 platform: PortSwigger
@@ -26,7 +26,7 @@ This lab demonstrates how an exposed debug page can disclose sensitive informati
 
 The objective was to obtain and submit the `SECRET_KEY` environment variable exposed through the application's debug page.
 
-![Lab question](/assets/images/writeups/portswigger/authentication_disclosure/idodp/1.png)
+![Lab question](/assets/images/writeups/portswigger/information_disclosure/idodp/1.png)
 
 # Walkthrough
 
@@ -34,7 +34,7 @@ The objective was to obtain and submit the `SECRET_KEY` environment variable exp
 
 After launching the lab, I accessed the target application and explored its available functionality. The website displayed a list of products, with individual product pages accessible through the interface.
 
-![Initial application page](/assets/images/writeups/portswigger/authentication_disclosure/idodp/2.png)
+![Initial application page](/assets/images/writeups/portswigger/information_disclosure/idodp/2.png)
 
 I began by browsing the application to understand its structure and identify potential entry points for further investigation.
 
@@ -42,7 +42,7 @@ I began by browsing the application to understand its structure and identify pot
 
 I selected one of the products to examine its details.
 
-![Product details page](/assets/images/writeups/portswigger/authentication_disclosure/idodp/3.png)
+![Product details page](/assets/images/writeups/portswigger/information_disclosure/idodp/3.png)
 
 While inspecting the page, I observed that the URL contained a `productId` parameter used to identify the selected product.
 
@@ -59,7 +59,7 @@ The steps were:
 3. Click **Open browser**.
 4. Enter the lab URL in the built-in browser.
 
-![Burp Suite and its built-in browser](/assets/images/writeups/portswigger/authentication_disclosure/idodp/4.png)
+![Burp Suite and its built-in browser](/assets/images/writeups/portswigger/information_disclosure/idodp/4.png)
 
 Using Burp Suite's browser allowed me to generate traffic through the proxy and inspect the application's requests and responses.
 
@@ -74,7 +74,7 @@ I followed these steps:
 3. Turn off the task's capturing or scanning activity as appropriate.
 4. Remove the task using the available task-management controls.
 
-![Removing the existing background scan](/assets/images/writeups/portswigger/authentication_disclosure/idodp/5.png)
+![Removing the existing background scan](/assets/images/writeups/portswigger/information_disclosure/idodp/5.png)
 
 This was a useful exercise in understanding how Burp Suite manages live tasks and how scanning activity can be configured.
 
@@ -90,7 +90,7 @@ The steps were:
 4. Configure the proxy-related options as shown in the screenshot.
 5. Save the task.
 
-![Manually configuring the live passive crawl](/assets/images/writeups/portswigger/authentication_disclosure/idodp/6.png)
+![Manually configuring the live passive crawl](/assets/images/writeups/portswigger/information_disclosure/idodp/6.png)
 
 A passive crawl analyses resources and traffic that Burp Suite observes without actively probing the target in the way an active scan would. This makes it useful for learning about application structure while limiting intrusive testing.
 
@@ -104,7 +104,7 @@ I then checked Burp Suite to confirm that the live passive crawl was processing 
 
 After confirming the task was active, I opened the **Target** tab to examine the discovered site structure.
 
-![Live passive crawl enabled](/assets/images/writeups/portswigger/authentication_disclosure/idodp/7.png)
+![Live passive crawl enabled](/assets/images/writeups/portswigger/information_disclosure/idodp/7.png)
 
 This step helped me understand the relationship between browser traffic, the proxy, and Burp Suite's site map.
 
@@ -112,7 +112,7 @@ This step helped me understand the relationship between browser traffic, the pro
 
 While examining the site map in the **Target** tab, I noticed a `cgi-bin` directory containing a `phpinfo.php` resource.
 
-![Site map showing the cgi-bin directory](/assets/images/writeups/portswigger/authentication_disclosure/idodp/8.png)
+![Site map showing the cgi-bin directory](/assets/images/writeups/portswigger/information_disclosure/idodp/8.png)
 
 The important observation was that this resource appeared in the discovered site structure even though I had not directly navigated to it during my initial browsing.
 
@@ -130,7 +130,7 @@ After identifying the resource, I copied its URL and opened it directly in the b
 
 The page displayed PHP configuration and environment information. While examining the output, I located the `SECRET_KEY` environment variable.
 
-![Exposed phpinfo.php page showing the environment information](/assets/images/writeups/portswigger/authentication_disclosure/idodp/9.png)
+![Exposed phpinfo.php page showing the environment information](/assets/images/writeups/portswigger/information_disclosure/idodp/9.png)
 
 This was the critical finding required to solve the lab. The application exposed a debug resource that revealed a sensitive environment variable to anyone who could access the page.
 
@@ -138,7 +138,7 @@ This was the critical finding required to solve the lab. The application exposed
 
 After locating the `SECRET_KEY`, I copied its value and submitted it through the lab's answer field.
 
-![Submitting the discovered SECRET_KEY](/assets/images/writeups/portswigger/authentication_disclosure/idodp/10.png)
+![Submitting the discovered SECRET_KEY](/assets/images/writeups/portswigger/information_disclosure/idodp/10.png)
 
 The application accepted the submitted value, confirming that I had successfully retrieved the requested secret.
 
@@ -146,7 +146,7 @@ The application accepted the submitted value, confirming that I had successfully
 
 After submitting the correct value, the lab displayed the completion confirmation.
 
-![Lab solved confirmation](/assets/images/writeups/portswigger/authentication_disclosure/idodp/11.png)
+![Lab solved confirmation](/assets/images/writeups/portswigger/information_disclosure/idodp/11.png)
 
 This confirmed that the exposed debug page had provided the information needed to complete the challenge.
 

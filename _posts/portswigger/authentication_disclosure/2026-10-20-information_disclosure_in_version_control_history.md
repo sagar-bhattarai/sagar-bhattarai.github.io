@@ -8,7 +8,7 @@ categories: [PortSwigger, Information Disclosure]
 tags: [burpsuite, git]
 
 image:
-  path: /assets/img/posts_thumbnails/portswigger/idivch.png
+  path: /assets/img/posts_thumbnails/portswigger/information_disclosure/idivch.png
   alt: "Information Disclosure in Version Control History - PortSwigger"
 
 platform: PortSwigger
@@ -26,7 +26,7 @@ This lab demonstrates how an exposed Git repository can disclose sensitive infor
 
 The objective was to discover the administrator's password through the application's exposed version control history, log in as the administrator, and delete the user `carlos`.
 
-![Lab question](/assets/images/writeups/portswigger/authentication_disclosure/idivch/1.png)
+![Lab question](/assets/images/writeups/portswigger/information_disclosure/idivch/1.png)
 
 # Walkthrough
 
@@ -34,7 +34,7 @@ The objective was to discover the administrator's password through the applicati
 
 After launching the lab, I accessed the target application and explored its available functionality. The website displayed a list of products, individual product pages, and a **My Account** option.
 
-![Initial application page](/assets/images/writeups/portswigger/authentication_disclosure/idivch/2.png)
+![Initial application page](/assets/images/writeups/portswigger/information_disclosure/idivch/2.png)
 
 I browsed the application to understand its structure and identify the available entry points for further investigation.
 
@@ -42,7 +42,7 @@ I browsed the application to understand its structure and identify the available
 
 I clicked **My Account**, which redirected me to the login page.
 
-![Login form](/assets/images/writeups/portswigger/authentication_disclosure/idivch/3.png)
+![Login form](/assets/images/writeups/portswigger/information_disclosure/idivch/3.png)
 
 The lab required me to obtain the administrator's password. Instead of attempting to guess the password, I needed to investigate whether the application exposed information that could help me discover it.
 
@@ -56,7 +56,7 @@ Using Burp Suite's **Discover content** feature, I checked the application for d
 
 During this process, I discovered several endpoints. One particularly interesting result was: `/.git/`
 
-![Discovered endpoints, including .git](/assets/images/writeups/portswigger/authentication_disclosure/idivch/endpoints.png)
+![Discovered endpoints, including .git](/assets/images/writeups/portswigger/information_disclosure/idivch/endpoints.png)
 
 ### Why was `.git` interesting?
 
@@ -72,15 +72,15 @@ I decided to investigate the exposed directory further.
 
 I opened the discovered URL in the browser: `https://<lab-id>.web-security-academy.net/.git/`
 
-![Accessing the exposed .git directory](/assets/images/writeups/portswigger/authentication_disclosure/idivch/4.png)
+![Accessing the exposed .git directory](/assets/images/writeups/portswigger/information_disclosure/idivch/4.png)
 
 I then explored the available repository resources, including the Git log information at: `/.git/logs`
 
-![Viewing .git/logs/HEAD](/assets/images/writeups/portswigger/authentication_disclosure/idivch/4_1.png)
+![Viewing .git/logs/HEAD](/assets/images/writeups/portswigger/information_disclosure/idivch/4_1.png)
 
 While examining the log, I noticed commit information and messages indicating that changes had been made to the project.
 
-![Commit history information](/assets/images/writeups/portswigger/authentication_disclosure/idivch/4_2.png)
+![Commit history information](/assets/images/writeups/portswigger/information_disclosure/idivch/4_2.png)
 
 This gave me a useful clue: the repository had a history of changes that might reveal information no longer present in the current version of the application.
 
@@ -94,7 +94,7 @@ I used `wget` to download the publicly accessible Git directory within the lab e
 wget -r https://<lab-id>.web-security-academy.net/.git/
 ```
 
-![Downloading the exposed Git repository](/assets/images/writeups/portswigger/authentication_disclosure/idivch/5.png)
+![Downloading the exposed Git repository](/assets/images/writeups/portswigger/information_disclosure/idivch/5.png)
 
 The command uses recursive downloading to retrieve accessible resources beneath the specified URL. The exact files retrieved depend on the server's configuration and how it exposes the directory.
 
@@ -104,7 +104,7 @@ After the download, I inspected the resulting directory structure.
 
 The `.git` directory is hidden by default on Linux because its name begins with a dot. To display hidden files and directories, I used:
 
-![Viewing the downloaded hidden .git directory](/assets/images/writeups/portswigger/authentication_disclosure/idivch/5_1.png)
+![Viewing the downloaded hidden .git directory](/assets/images/writeups/portswigger/information_disclosure/idivch/5_1.png)
 
 ```bash
 ls -la
@@ -112,7 +112,7 @@ ls -la
 
 I then examined the downloaded repository data and its internal files and directories.
 
-![Inspecting the downloaded Git repository data](/assets/images/writeups/portswigger/authentication_disclosure/idivch/5_2.png)
+![Inspecting the downloaded Git repository data](/assets/images/writeups/portswigger/information_disclosure/idivch/5_2.png)
 
 **Important:** Git commands should normally be run from the working-tree directory that contains `.git`, rather than from inside `.git` itself. If only the repository metadata was downloaded, the commands can instead be run with an explicit Git directory, provided the required repository objects were retrieved successfully.
 
@@ -126,7 +126,7 @@ I started with:
 git branch
 ```
 
-![Inspecting Git branches](/assets/images/writeups/portswigger/authentication_disclosure/idivch/5_3.png)
+![Inspecting Git branches](/assets/images/writeups/portswigger/information_disclosure/idivch/5_3.png)
 
 The output showed the available branch information. In this case, I observed a branch named `master`.
 
@@ -136,7 +136,7 @@ I then examined the commit history:
 git log
 ```
 
-![Viewing the Git commit history](/assets/images/writeups/portswigger/authentication_disclosure/idivch/5_4.png)
+![Viewing the Git commit history](/assets/images/writeups/portswigger/information_disclosure/idivch/5_4.png)
 
 The log showed the recorded commits, including their identifiers, authors, dates, and messages.
 
@@ -154,7 +154,7 @@ The general syntax is:
 git diff <older-commit-id> <newer-commit-id>
 ```
 
-![Comparing changes between Git commits](/assets/images/writeups/portswigger/authentication_disclosure/idivch/5_5.png)
+![Comparing changes between Git commits](/assets/images/writeups/portswigger/information_disclosure/idivch/5_5.png)
 
 This command compares the contents represented by two commits and displays their differences.
 
@@ -170,7 +170,7 @@ I also used:
 git log -p
 ```
 
-![Inspecting commit history and patches with git log -p](/assets/images/writeups/portswigger/authentication_disclosure/idivch/5_6.png)
+![Inspecting commit history and patches with git log -p](/assets/images/writeups/portswigger/information_disclosure/idivch/5_6.png)
 
 Unlike `git log` alone, `git log -p` displays the patches associated with commits. These patches show the changes introduced by each commit.
 
@@ -195,7 +195,7 @@ This explains why inspecting the current source code alone may not reveal every 
 
 After locating the administrator password in the repository history, I returned to the application's login page and used the recovered credentials.
 
-![Logging in with the recovered administrator credentials](/assets/images/writeups/portswigger/authentication_disclosure/idivch/6.png)
+![Logging in with the recovered administrator credentials](/assets/images/writeups/portswigger/information_disclosure/idivch/6.png)
 
 The credentials allowed me to log in as the administrator.
 
@@ -205,7 +205,7 @@ This confirmed that the information disclosed through the Git history was useful
 
 After logging in, I accessed the administrative interface and observed the available user-management functionality.
 
-![Admin dashboard and user-management functionality](/assets/images/writeups/portswigger/authentication_disclosure/idivch/6_1.png)
+![Admin dashboard and user-management functionality](/assets/images/writeups/portswigger/information_disclosure/idivch/6_1.png)
 
 The dashboard displayed user accounts and the corresponding delete functionality.
 
@@ -215,7 +215,7 @@ I located the user `carlos` and proceeded with the required action for the lab.
 
 I used the available administrative functionality to delete the user `carlos`.
 
-![Deleting the user and confirming lab completion](/assets/images/writeups/portswigger/authentication_disclosure/idivch/6_2.png)
+![Deleting the user and confirming lab completion](/assets/images/writeups/portswigger/information_disclosure/idivch/6_2.png)
 
 The lab displayed its completion confirmation, indicating that I had successfully recovered the administrator password, authenticated as the administrator, and completed the required action.
 
