@@ -5,7 +5,7 @@ date: 2026-10-19 14:20:12 +0545
 description: "Using the HTTP TRACE method to identify a trusted IP authorization header, bypass an IP-based access control mechanism, and access the admin panel with Burp Suite."
 
 categories: [PortSwigger, Information Disclosure]
-tags: [burpsuite]
+tags: [burpsuite, TRACE method, custom-header]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/abvid.png
