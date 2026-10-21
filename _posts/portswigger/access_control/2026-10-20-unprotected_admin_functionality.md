@@ -19,7 +19,7 @@ status: complete
 
 # Overview
 
-This lab demonstrates how inadequate access controls can expose administrative functionality to unauthorized users. By inspecting the application's `robots.txt` file, I discovered the `/administrator-panel` endpoint and accessed it directly without administrator authentication. I then used the exposed functionality to delete the user `carlos` and complete the lab.
+This lab demonstrates how inadequate access controls can expose administrative functionality to unauthorized users. By inspecting the application's `robots.txt` file, I discovered the `/admin<REDACTED>nel` endpoint and accessed it directly without administrator authentication. I then used the exposed functionality to delete the user `carlos` and complete the lab.
 
 # Question / Lab Objective
 
@@ -51,7 +51,7 @@ I accessed the following path on the lab's domain:
 
 `https://<lab-id>.web-security-academy.net/robots.txt`
 
-The `robots.txt` file contained a reference to the administrative endpoint: `/administrator-panel`
+The `robots.txt` file contained a reference to the administrative endpoint: `/admin<REDACTED>anel`
 
 ![robots.txt revealing the administrator-panel endpoint](/assets/images/writeups/portswigger/access_control/uaf/4.png)
 
@@ -69,7 +69,7 @@ This was the key clue that guided my investigation.
 
 After identifying the endpoint, I navigated directly to:
 
-`https://<lab-id>.web-security-academy.net/administrator-panel`
+`https://<lab-id>.web-security-academy.net/admi<REDACTED>nel`
 
 The application displayed the administrative interface without requiring me to authenticate as an administrator.
 
@@ -118,7 +118,7 @@ To prevent unprotected administrative functionality:
 
 # Conclusion
 
-This lab demonstrated how a simple configuration mistake can expose privileged application functionality. By inspecting `robots.txt`, I discovered the `/administrator-panel` endpoint and accessed it directly. Because the application did not properly enforce authorization, I was able to reach the admin interface and delete the user `carlos`.
+This lab demonstrated how a simple configuration mistake can expose privileged application functionality. By inspecting `robots.txt`, I discovered the `/admin<REDACTED>nel` endpoint and accessed it directly. Because the application did not properly enforce authorization, I was able to reach the admin interface and delete the user `carlos`.
 
 The main lesson is that administrative functionality must be protected by server-side authentication and authorization checks. Concealing a URL is never a substitute for enforcing access controls.
 
