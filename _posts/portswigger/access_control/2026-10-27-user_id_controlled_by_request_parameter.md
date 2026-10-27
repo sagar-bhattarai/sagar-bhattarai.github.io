@@ -5,7 +5,7 @@ date: 2026-10-27 14:30:12 +0545
 description: "Testing for broken access control by modifying a user ID parameter and retrieving another user's API key."
 
 categories: [PortSwigger, Access Control]
-tags: [burpsuite, IDOR]
+tags: [burpsuite, idor]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/access_control/uicbrp.png
