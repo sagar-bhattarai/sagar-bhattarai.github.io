@@ -5,7 +5,7 @@ date: 2026-10-21 17:03:12 +0545
 description: "Discovering an unprotected administrative endpoint in JavaScript source code and accessing privileged functionality without proper authorization."
 
 categories: [PortSwigger, Access Control]
-tags: [burpsuite, javascript, access-control]
+tags: [burpsuite]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/access_control/uafwuu.png

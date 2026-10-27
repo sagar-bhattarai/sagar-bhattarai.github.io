@@ -5,7 +5,7 @@ date: 2026-10-26 08:11:12 +0545
 description: "A PortSwigger access control lab demonstrating how modifying a client-controlled cookie can grant unauthorized access to administrative functionality."
 
 categories: [PortSwigger, Access Control]
-tags: [burpsuite, web-security, cookies, privilege-escalation]
+tags: [burpsuite, cookies]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/access_control/urcbrp.png
