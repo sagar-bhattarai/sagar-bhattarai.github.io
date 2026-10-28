@@ -1,164 +1,123 @@
 ---
-title: "User ID Controlled by Request Parameter with Password Disclosure - PortSwigger"
-date: 2026-10-28 09:19:20 +0545
+title: "Insecure Direct Object References (IDOR) - PortSwigger"
+date: 2026-10-28 13:02:20 +0545
 
-description: "Exploiting broken access control by manipulating a user ID parameter to disclose the administrator's password, access the admin panel, and delete another user."
+description: "Exploiting an insecure direct object reference in a live chat transcript feature to access another user's conversation and retrieve credentials."
 
 categories: [PortSwigger, Access Control]
 tags: [burpsuite, idor]
 
 image:
-  path: /assets/img/posts_thumbnails/portswigger/access_control/uicbrpwpd.png
-  alt: "User ID Controlled by Request Parameter with Password Disclosure - PortSwigger"
+  path: /assets/img/posts_thumbnails/portswigger/access_control/idor.png
+  alt: "Insecure Direct Object References - PortSwigger"
 
 platform: PortSwigger
 
-lab: "User ID controlled by request parameter with password disclosure"
+lab: "Insecure direct object references"
 type: "Lab Write-up"
 status: complete
 ---
 
 # Overview
 
-This lab demonstrates how broken access control can expose sensitive account information when an application trusts a user-controlled request parameter to identify an account. By changing the `id` parameter from `wiener` to `administrator`, I was able to retrieve the administrator's password from the server's response, log in as the administrator, and access the admin panel to delete the user `carlos`.
+This lab demonstrates how broken access control can expose sensitive information when an application uses predictable file identifiers without properly verifying authorization. By intercepting a live chat transcript request in Burp Suite and changing the requested filename from `2.txt` to `1.txt`, I accessed another user's conversation and discovered their password. I then used the credentials to log in as the target user and complete the lab.
 
 # Question / Lab Objective
 
-The objective was to retrieve the administrator's password and delete the user `carlos` by exploiting an access control vulnerability in which the application relied on a user-controlled request parameter to identify the account being accessed.
+The objective was to exploit an insecure direct object reference (IDOR) in the live chat transcript functionality to obtain Carlos's password and log in to his account.
 
-![Lab question](/assets/images/writeups/portswigger/access_control/uicbrpwpd/1.png)
+![Lab question](/assets/images/writeups/portswigger/access_control/idor/1.png)
 
 # Walkthrough
 
 ## 1. Exploring the application
 
-After launching the lab, I accessed the target application and explored its available functionality. The website displayed several products and provided a **My Account** option.
+After launching the lab, I accessed the target application and explored its available functionality. The website displayed several products, an account section, and a **Live Chat** option.
 
-![Initial application page](/assets/images/writeups/portswigger/access_control/uicbrpwpd/2.png)
+![Initial application page](/assets/images/writeups/portswigger/access_control/idor/2.png)
 
 I browsed the application to understand its structure and identify potential entry points for further investigation.
 
-Since the lab focused on access control and password disclosure, I paid particular attention to account-related functionality and how the application identified individual users.
+## 2. Accessing the live chat page
 
-## 2. Accessing the login page
+I clicked **Live Chat** and started a conversation with Hal Pline. While exploring the chat interface, I noticed an option to view or download the conversation transcript.
 
-I clicked **My Account**, which redirected me to the login page.
+![Live chat interface](/assets/images/writeups/portswigger/access_control/idor/3.png)
 
-![Login form](/assets/images/writeups/portswigger/access_control/uicbrpwpd/3.png)
+This feature became the starting point for my investigation because transcript downloads often involve a request parameter or filename that identifies the requested conversation.
 
-The lab provided credentials for the user `wiener`. I used these credentials to authenticate and access the account page.
+## 3. Intercepting the transcript request in Burp Suite
 
-After logging in, I was redirected to Wiener's account dashboard. I noticed an account-management form that included password-related functionality. Although the password field appeared hidden in the browser, I wanted to investigate how the application handled account information on the server side.
+I clicked the option to view the transcript. The application downloaded a text file named `4.txt`, containing the conversation.
 
-![Wiener's user dashboard](/assets/images/writeups/portswigger/access_control/uicbrpwpd/4.png)
+I examined the corresponding HTTP request and response in Burp Suite. In the response, I could see the chat transcript returned by the server.
 
-I also confirmed that I was working within an authenticated session belonging to the legitimate user `wiener`.
+![Downloaded transcript and response in Burp Suite](/assets/images/writeups/portswigger/access_control/idor/4.png)
 
-![Authenticated session for the legitimate Wiener user](/assets/images/writeups/portswigger/access_control/uicbrpwpd/5.png)
+The filename `4.txt` caught my attention because it appeared to use a predictable numeric identifier. I decided to investigate whether changing that identifier would allow access to a different transcript.
 
-This was important because it allowed me to test whether the application enforced proper access controls when an authenticated user requested another account's information.
+## 4. Modifying the transcript filename
 
-**Key observation:** Hiding a password field in the browser does not guarantee that the underlying value is protected. Sensitive information must be protected by the server, not merely concealed by the user interface.
+I sent the transcript request to Burp Suite's **Repeater** tool so that I could modify the request and inspect the server's response without repeatedly interacting with the browser.
 
-## 3. Inspecting and modifying the user ID parameter
+I changed the requested filename from `4.txt` to `1.txt` and sent the modified request.
 
-I examined the account-related request and noticed that the application used an `id` parameter to identify the account whose information was being requested.
+![Modified transcript request and response in Repeater](/assets/images/writeups/portswigger/access_control/idor/5.png)
 
-I decided to test whether changing this parameter would allow me to access another user's account information.
+The server returned a different chat transcript. While examining the response, I found a conversation containing Carlos's password.
 
-The original and modified parameter values were:
+This demonstrated the access control weakness: the application allowed me to request a different transcript by changing a predictable identifier, without properly checking whether I was authorized to access that conversation.
 
-- Original: `id=wiener`
-- Modified: `id=administrator`
+**Key finding:** Changing the filename from `4.txt` to `1.txt` exposed another user's chat transcript and sensitive credentials.
 
-I changed the identifier from `wiener` to `administrator` while keeping the same authenticated session.
+## 5. Logging in with Carlos's credentials
 
-I then sent the modified request and inspected the server's response in Burp Suite.
+After retrieving Carlos's password, I returned to the application's login page and entered the disclosed credentials to authenticate as `carlos`.
 
-![Modified request and server response](/assets/images/writeups/portswigger/access_control/uicbrpwpd/6.png)
+![Logging in with Carlos's credentials](/assets/images/writeups/portswigger/access_control/idor/6.png)
 
-The response disclosed the administrator's password, even though the request originated from a session authenticated as `wiener`.
+The application accepted the credentials and granted access to Carlos's account, confirming that the disclosed information could be used to compromise another user's account in this lab.
 
-This revealed the core vulnerability: **the application trusted a user-controlled account identifier without properly restricting access to the requested account's sensitive information.**
+## 6. Confirming lab completion
 
-The server also returned an HTTP `302` redirect. However, a redirect is not a security control. The sensitive information had already been included in the response, so the redirect did not undo the disclosure.
+After logging in successfully, I was redirected to Carlos's account page, and the lab displayed the solved confirmation.
 
-## 4. Logging in with the administrator's credentials
+![Lab solved confirmation](/assets/images/writeups/portswigger/access_control/idor/7.png)
 
-After retrieving the administrator's password, I returned to the login page and used the disclosed credentials to authenticate as `administrator`.
-
-![Logging in with the administrator's credentials](/assets/images/writeups/portswigger/access_control/uicbrpwpd/7.png)
-
-The application accepted the credentials and provided access to the administrator's account.
-
-This confirmed that the disclosed password could be used to authenticate as the privileged user, demonstrating a more serious impact than account information exposure alone.
-
-## 5. Exploring the administrator dashboard
-
-After logging in as the administrator, I examined the dashboard and identified the available account-management functionality.
-
-The page provided access to the **Admin panel**, alongside the account's own email and password update functionality.
-
-![Administrator dashboard](/assets/images/writeups/portswigger/access_control/uicbrpwpd/8.png)
-
-The presence of an admin panel indicated that the account had elevated privileges compared with the ordinary `wiener` account.
-
-I proceeded to the admin panel to locate the user-management functionality required to complete the lab.
-
-## 6. Deleting the user Carlos
-
-Inside the admin panel, I found the user-management interface, which allowed the administrator to manage existing accounts.
-
-![Admin panel user management](/assets/images/writeups/portswigger/access_control/uicbrpwpd/9.png)
-
-I located the user `carlos` and used the available deletion functionality to remove the account.
-
-This completed the final objective of the lab: using the disclosed administrator password to access privileged functionality and delete the specified user.
-
-## 7. Confirming lab completion
-
-After deleting `carlos`, the application displayed a successful deletion message and confirmed that the lab had been solved.
-
-![Lab solved confirmation](/assets/images/writeups/portswigger/access_control/uicbrpwpd/10.png)
-
-This confirmed that I had successfully exploited the application's broken access control, obtained the administrator's password, accessed the admin panel, and completed the required action.
+This confirmed that I had successfully exploited the insecure transcript access and completed the lab's objective.
 
 # Key Takeaways
 
-- **Never trust user-controlled identifiers:** Parameters such as `id`, `user`, or `account` must not determine authorization on their own.
-- **Test for IDOR vulnerabilities:** Changing an account identifier can reveal whether the server improperly allows access to another user's data.
-- **Authentication is not authorization:** Being logged in does not automatically grant permission to view another user's sensitive information.
-- **Client-side hiding is not security:** Password fields, hidden HTML elements, and other interface-level restrictions cannot protect information already disclosed by the server.
-- **Inspect complete HTTP responses:** A redirect status such as `302` does not guarantee that a response contains no sensitive information.
-- **Understand privilege escalation:** Exposing an administrator's password can allow an attacker to gain elevated privileges and access administrative functions.
-- **Verify the full impact:** Demonstrating access to sensitive information and then confirming the consequences in the lab provides a clearer understanding of the vulnerability.
+- **Understand IDOR:** An insecure direct object reference occurs when an application exposes a reference to an object, such as a filename or record ID, without adequately enforcing authorization.
+- **Inspect file downloads:** Download and transcript features can reveal how applications identify and retrieve user-specific resources.
+- **Look for predictable identifiers:** Sequential filenames such as `1.txt` and `2.txt` can make resources easy to enumerate, although predictability alone does not establish a vulnerability.
+- **Use Burp Suite Repeater:** Repeater allows individual request parameters to be modified and server responses to be compared systematically.
+- **Check authorization, not just authentication:** Being logged in should not automatically grant access to every user's files or records.
+- **Recognize the impact of exposed credentials:** A transcript disclosure can become an account compromise when sensitive authentication information is included in the conversation.
 
 # Security Impact
 
-This vulnerability can result in unauthorized disclosure of sensitive account information and potentially lead to privilege escalation.
+An IDOR vulnerability can allow an authenticated user to access another user's private resources by modifying an object identifier in an HTTP request.
 
-In this lab, manipulating the `id` parameter exposed the administrator's password to an authenticated low-privileged user. Because the password could be used to log in as the administrator, the issue enabled access to privileged functionality, including user management and account deletion.
+In this lab, the transcript endpoint returned another user's conversation when the filename was changed. Because the conversation contained Carlos's password, the disclosure escalated from unauthorized access to a transcript to account compromise.
 
-In a real-world application, similar weaknesses could expose personal information, account credentials, or administrative functions. Depending on the privileges available, an attacker might be able to modify accounts, delete users, or perform other unauthorized actions.
-
-The severity depends on the sensitivity of the disclosed information, the privileges associated with the affected account, and the actions available after gaining access.
+In a real-world application, similar weaknesses could expose private messages, personal information, account records, documents, or other sensitive data. The severity depends on the sensitivity of the exposed information, the number of affected users, and whether the disclosed data enables further unauthorized access.
 
 # Remediation
 
-To prevent this type of vulnerability:
+To prevent IDOR vulnerabilities:
 
-1. **Enforce server-side authorization:** Verify on every request that the authenticated user is permitted to access the requested account and resource.
-2. **Do not expose passwords:** Never return plaintext passwords in account pages, API responses, HTML, or other client-accessible content.
-3. **Use secure password storage:** Store passwords using a suitable, salted password-hashing algorithm rather than retaining recoverable plaintext passwords.
-4. **Separate authentication from authorization:** Validate the user's identity and independently verify permissions for every protected action.
-5. **Protect administrative functionality:** Restrict admin panels and user-management actions to properly authorized administrators.
-6. **Validate account identifiers securely:** Treat request parameters as untrusted input. Use the authenticated identity and server-side permission checks to determine which resources may be accessed.
-7. **Test for broken access control:** Include authorization tests that attempt to access other users' accounts and privileged actions using lower-privileged sessions.
+1. **Enforce server-side authorization:** Verify that the authenticated user has permission to access the specific transcript or resource requested.
+2. **Validate every object request:** Do not assume that a user is authorized simply because they are logged in or know a valid filename.
+3. **Avoid exposing credentials in chat transcripts:** Passwords and other authentication secrets should not be shared or stored in conversation histories.
+4. **Use secure resource-handling practices:** Opaque identifiers can make enumeration more difficult, but they must never replace proper authorization checks.
+5. **Apply least privilege:** Users should only be able to access resources they are explicitly authorized to view.
+6. **Test for horizontal privilege escalation:** During authorized security testing, verify that changing an object identifier does not expose another user's data.
 
 # Conclusion
 
-This lab demonstrated how a user-controlled request parameter can expose sensitive information when proper authorization checks are missing. By changing `id=wiener` to `id=administrator`, I retrieved the administrator's password, authenticated with the privileged account, and used the admin panel to delete `carlos`.
+This lab demonstrated how a seemingly simple live chat transcript feature can introduce a serious access control vulnerability. By intercepting the transcript request in Burp Suite, changing the filename from `2.txt` to `1.txt`, and inspecting the response, I retrieved Carlos's password and gained access to his account.
 
-The main lesson is that access control must be enforced on the server for every sensitive resource and action. User identifiers, hidden interface elements, and HTTP redirects are not substitutes for proper authorization and secure handling of credentials.
+The key lesson is that applications must verify authorization for every requested resource. Predictable identifiers can make testing easier, but the underlying security failure is the absence of proper server-side access control.
 
 *Thanks for reading!*
