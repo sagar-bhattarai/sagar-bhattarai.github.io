@@ -5,7 +5,7 @@ date: 2026-10-29 09:11:12 +0545
 description: "Exploiting broken access control in a multi-step administrative process by replaying the confirmation request with a lower-privileged user's session."
 
 categories: [PortSwigger, Access Control]
-tags: [burpsuite]
+tags: [burpsuite, idor]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/access_control/mspwnacoos.png
