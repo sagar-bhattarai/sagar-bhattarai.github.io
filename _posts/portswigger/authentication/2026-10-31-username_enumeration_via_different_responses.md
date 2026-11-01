@@ -132,7 +132,7 @@ The `302 Found` response indicated that the application was redirecting the requ
 
 This difference suggested that the supplied credentials were accepted.
 
-I had successfully identified the valid password ie `superman` associated with the username `ajax`.
+I successfully identified the valid password `superman` associated with the username `ajax`. These credentials are specific to this lab environment and may differ in other labs, so they should not be considered real-world credentials.
 
 ## 5. Logging in and confirming lab completion
 
