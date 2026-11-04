@@ -46,7 +46,7 @@ Get-ComputerInfo -Property "Os*"
 
 **Reason:** Knowing the OS version helps investigators interpret logs and system behavior correctly.
 
-![systeminfo](/assets/images/writeups/windows/investigating_windows/1.png)
+![systeminfo](/assets/images/writeups/thm/windows/investigating_windows/1.png)
 
 ---
 
@@ -93,7 +93,7 @@ quser
 
 **Reason:** Event ID 4624 records successful logons. Registry information and `quser` can provide additional context, but they do not independently establish the last historical logon.
 
-![Get-LocalUser](/assets/images/writeups/windows/investigating_windows/2.png)
+![Get-LocalUser](/assets/images/writeups/thm/windows/investigating_windows/2.png)
 
 ---
 
@@ -122,7 +122,7 @@ Open Windows Logs → Security, filter for Event ID `4624`, and inspect the acco
 
 **Reason:** Comparing account activity with suspicious events can help identify potentially unauthorized access. Confirm the date format and time zone when correlating timestamps.
 
-![net user John](/assets/images/writeups/windows/investigating_windows/3.png)
+![net user John](/assets/images/writeups/thm/windows/investigating_windows/3.png)
 
 ---
 
@@ -168,9 +168,9 @@ reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
 
 **Reason:** The Run key launches programs during startup. The remote address, suspicious executable, and redirected command output are indicators worth investigating for persistence and unauthorized data collection.
 
-![Win32_StartupCommand](/assets/images/writeups/windows/investigating_windows/4.png)
+![Win32_StartupCommand](/assets/images/writeups/thm/windows/investigating_windows/4.png)
 
-![Startup command details](/assets/images/writeups/windows/investigating_windows/4_1.png)
+![Startup command details](/assets/images/writeups/thm/windows/investigating_windows/4_1.png)
 
 ---
 
@@ -196,9 +196,9 @@ Open Computer Management → Local Users and Groups → Groups → Administrator
 
 **Reason:** Identifying unexpected administrators helps investigators determine which accounts could make privileged system changes.
 
-![LocalGroupMember](/assets/images/writeups/windows/investigating_windows/5.png)
+![LocalGroupMember](/assets/images/writeups/thm/windows/investigating_windows/5.png)
 
-![Administrators group](/assets/images/writeups/windows/investigating_windows/5_1.png)
+![Administrators group](/assets/images/writeups/thm/windows/investigating_windows/5_1.png)
 
 ---
 
@@ -234,7 +234,7 @@ schtasks /query /fo LIST /v
 
 **Reason:** Reviewing the task's configured action reveals what it executes and whether it provides a persistence mechanism.
 
-![ScheduledTask](/assets/images/writeups/windows/investigating_windows/6.png)
+![ScheduledTask](/assets/images/writeups/thm/windows/investigating_windows/6.png)
 
 ---
 
@@ -311,7 +311,7 @@ Get-LocalUser -Name Jenny |
 
 **Reason:** Comparing account activity with group membership and other events can help determine whether an account was created or modified for suspicious purposes. A missing logon timestamp alone does not prove malicious activity.
 
-![net user Jenny](/assets/images/writeups/windows/investigating_windows/7.png)
+![net user Jenny](/assets/images/writeups/thm/windows/investigating_windows/7.png)
 
 ---
 
@@ -340,7 +340,7 @@ Inspect suspicious startup entries and correlate their associated files and exec
 
 **Reason:** Correlating account, logon, and persistence evidence helps establish the likely compromise date. File timestamps alone can be misleading or manipulated.
 
-![Compromise date](/assets/images/writeups/windows/investigating_windows/10.png)
+![Compromise date](/assets/images/writeups/thm/windows/investigating_windows/10.png)
 
 ---
 
@@ -400,7 +400,7 @@ Get-FileHash C:\TMP\mim.exe
 
 **Reason:** The executable and its output can help identify credential-access activity. A filename alone is not conclusive, so examine the file's contents, hash, and surrounding evidence.
 
-![Mimikatz evidence](/assets/images/writeups/windows/investigating_windows/12.png)
+![Mimikatz evidence](/assets/images/writeups/thm/windows/investigating_windows/12.png)
 
 ---
 
@@ -424,7 +424,7 @@ Inspect suspicious entries involving `google.com` and `www.google.com`.
 
 **Reason:** The reported IP is associated with suspicious host-file mappings in this investigation. Treat this as an indicator to verify against other artifacts, not as independent proof of command-and-control traffic.
 
-![External server IP](/assets/images/writeups/windows/investigating_windows/13.png)
+![External server IP](/assets/images/writeups/thm/windows/investigating_windows/13.png)
 
 ---
 
@@ -456,7 +456,7 @@ Inspect suspicious files and their timestamps.
 
 **Reason:** The `.jsp` extension is associated with JavaServer Pages. A suspicious uploaded script may indicate a web shell, although its contents and execution context should be examined before confirming its functionality.
 
-![JSP evidence](/assets/images/writeups/windows/investigating_windows/14.png)
+![JSP evidence](/assets/images/writeups/thm/windows/investigating_windows/14.png)
 
 ---
 
@@ -487,9 +487,9 @@ netsh advfirewall firewall show rule name=all verbose
 
 **Reason:** An unexpected inbound rule may expose a service to remote connections. The current rule listing does not necessarily establish when a rule was created, so correlate it with available logs and other evidence.
 
-![Firewall port](/assets/images/writeups/windows/investigating_windows/15.png)
+![Firewall port](/assets/images/writeups/thm/windows/investigating_windows/15.png)
 
-![Firewall rule details](/assets/images/writeups/windows/investigating_windows/15_1.png)
+![Firewall rule details](/assets/images/writeups/thm/windows/investigating_windows/15_1.png)
 
 ---
 

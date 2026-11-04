@@ -56,9 +56,9 @@ The scan revealed several interesting services:
 13404/tcp   unknown
 ```
 
-![Nmap](/assets/images/writeups/the_great_disappearing_act/1.png)
+![Nmap](/assets/images/writeups/thm/the_great_disappearing_act/1.png)
 
-![Nmap](/assets/images/writeups/the_great_disappearing_act/1_1.png)
+![Nmap](/assets/images/writeups/thm/the_great_disappearing_act/1_1.png)
 
 There were multiple HTTP services, so instead of focusing only on port `80`, I decided to inspect the different web services individually.
 
@@ -68,7 +68,7 @@ There were multiple HTTP services, so instead of focusing only on port `80`, I d
 
 Opening the web application on ports `80` and `8080` revealed login forms.
 
-![form](/assets/images/writeups/the_great_disappearing_act/2.png)
+![form](/assets/images/writeups/thm/the_great_disappearing_act/2.png)
 
 At this point, the important question was:
 
@@ -87,15 +87,15 @@ The source code revealed several CGI endpoints:
 /cgi-bin/login.sh
 ```
 
-![form source code](/assets/images/writeups/the_great_disappearing_act/2_4.png)
+![form source code](/assets/images/writeups/thm/the_great_disappearing_act/2_4.png)
 
 This was useful because it showed that the application was not simply a static login page.
 
 There were several backend scripts responsible for different parts of the challenge.
 
-![auth request for first flag form](/assets/images/writeups/the_great_disappearing_act/2_5.png)
+![auth request for first flag form](/assets/images/writeups/thm/the_great_disappearing_act/2_5.png)
 
-![final escape challenge form](/assets/images/writeups/the_great_disappearing_act/2_6.png)
+![final escape challenge form](/assets/images/writeups/thm/the_great_disappearing_act/2_6.png)
 
 ---
 
@@ -107,11 +107,11 @@ I then started checking the other ports discovered during the Nmap scan.
 
 Port `13402` returned an nginx welcome page.
 
-![nginx](/assets/images/writeups/the_great_disappearing_act/2_2.png)
+![nginx](/assets/images/writeups/thm/the_great_disappearing_act/2_2.png)
 
 Another service returned an unauthorized response.
 
-![unauthorized](/assets/images/writeups/the_great_disappearing_act/2_3.png)
+![unauthorized](/assets/images/writeups/thm/the_great_disappearing_act/2_3.png)
 
 This suggested that authentication or specific requests might be required to access some of these services.
 
@@ -121,11 +121,11 @@ This suggested that authentication or specific requests might be required to acc
 
 Port `8000` exposed a Fakebook login/signup portal.
 
-![fakebook login form](/assets/images/writeups/the_great_disappearing_act/2_7.png)
+![fakebook login form](/assets/images/writeups/thm/the_great_disappearing_act/2_7.png)
 
 I also inspected the source code.
 
-![fakebook login form source code](/assets/images/writeups/the_great_disappearing_act/2_8.png)
+![fakebook login form source code](/assets/images/writeups/thm/the_great_disappearing_act/2_8.png)
 
 At this point, there were already multiple possible attack directions:
 
@@ -145,7 +145,7 @@ ffuf -u http://<target-ip>/FUZZ \
 -t 50
 ```
 
-![ffuf on IP only](/assets/images/writeups/the_great_disappearing_act/3.png)
+![ffuf on IP only](/assets/images/writeups/thm/the_great_disappearing_act/3.png)
 
 The main interesting discovery was `/cgi-bin`
 
@@ -157,7 +157,7 @@ ffuf -u http://<target-ip>:8000/FUZZ \
 -t 50
 ```
 
-![ffuf on 8000](/assets/images/writeups/the_great_disappearing_act/3_1.png)
+![ffuf on 8000](/assets/images/writeups/thm/the_great_disappearing_act/3_1.png)
 
 This exposed additional functionality belonging to the Fakebook service.
 
@@ -177,7 +177,7 @@ The posts appeared to contain clues related to credentials.
 
 One account caught my attention ie `guard.hopkins@hopsecasylum.com`
 
-![email](/assets/images/writeups/the_great_disappearing_act/email.png)
+![email](/assets/images/writeups/thm/the_great_disappearing_act/email.png)
 
 A post appeared to reveal information about the user's password through social engineering.
 
@@ -185,11 +185,11 @@ The account had subsequently changed its password.
 
 That meant the original password was probably not directly usable.
 
-![password change](/assets/images/writeups/the_great_disappearing_act/pw_change.png)
+![password change](/assets/images/writeups/thm/the_great_disappearing_act/pw_change.png)
 
 However, the posts gave me several words and pieces of information that could potentially be used to construct the new password.
 
-![wordlist of guard user](/assets/images/writeups/the_great_disappearing_act/3_2.png)
+![wordlist of guard user](/assets/images/writeups/thm/the_great_disappearing_act/3_2.png)
 
 ---
 
@@ -245,7 +245,7 @@ word3word3
 
 The generated combinations were saved to `passwords.txt`
 
-![passwords generated using hashcat](/assets/images/writeups/the_great_disappearing_act/3_3.png)
+![passwords generated using hashcat](/assets/images/writeups/thm/the_great_disappearing_act/3_3.png)
 
 This was a useful example of how OSINT can be converted into a targeted password wordlist rather than relying entirely on a generic wordlist.
 
@@ -271,7 +271,7 @@ http-post-form \
 "/cgi-bin/login.sh:username=^USER^&password=^PASS^:F=Invalid"
 ```
 
-![bruteforcing using Hydra](/assets/images/writeups/the_great_disappearing_act/3_4.png)
+![bruteforcing using Hydra](/assets/images/writeups/thm/the_great_disappearing_act/3_4.png)
 
 Hydra successfully identified valid credentials.
 
@@ -307,7 +307,7 @@ I then tested the same credentials against the similar login form on port `8080`
 
 This time, authentication succeeded.
 
-![8080 login form](/assets/images/writeups/the_great_disappearing_act/3_5.png)
+![8080 login form](/assets/images/writeups/thm/the_great_disappearing_act/3_5.png)
 
 This was an important reminder:
 
@@ -321,7 +321,7 @@ After logging in, I explored the available functionality.
 
 The first camera feed was unavailable.
 
-![camera 1 feed](/assets/images/writeups/the_great_disappearing_act/3_6.png)
+![camera 1 feed](/assets/images/writeups/thm/the_great_disappearing_act/3_6.png)
 
 I then found a **Cell/Storage** section.
 
@@ -333,7 +333,7 @@ The popup contained an option to unlock the cell door.
 
 After selecting the unlock option, the application reported that the cell door had been unlocked and revealed the first flag.
 
-![first flag](/assets/images/writeups/the_great_disappearing_act/3_7.png)
+![first flag](/assets/images/writeups/thm/the_great_disappearing_act/3_7.png)
 
 So the first stage was effectively:
 
@@ -361,19 +361,19 @@ FLAG 1
 
 I reused the credentials against the video portal on port `13400`.
 
-![video portal](/assets/images/writeups/the_great_disappearing_act/4.png)
+![video portal](/assets/images/writeups/thm/the_great_disappearing_act/4.png)
 
 The portal contained four videos.
 
 Three of the videos displayed a message indicating that I had been `JESTERED`
 
-![video portal jestered](/assets/images/writeups/the_great_disappearing_act/4_1.png)
+![video portal jestered](/assets/images/writeups/thm/the_great_disappearing_act/4_1.png)
 
 One video was different.
 
 It appeared to be related to the administrator, but access was restricted.
 
-![video portal restricted](/assets/images/writeups/the_great_disappearing_act/4_2.png)
+![video portal restricted](/assets/images/writeups/thm/the_great_disappearing_act/4_2.png)
 
 This suggested that the restriction itself might be part of the challenge.
 
@@ -383,13 +383,13 @@ This suggested that the restriction itself might be part of the challenge.
 
 I opened Burp Suite and intercepted the request generated when selecting the camera lobby.
 
-![cam lobby](/assets/images/writeups/the_great_disappearing_act/4_3.png)
+![cam lobby](/assets/images/writeups/thm/the_great_disappearing_act/4_3.png)
 
 After forwarding the request, another request was generated `/v1/streams/request`
 
 The request used POST and contained information identifying the camera and its tier.
 
-![stream request](/assets/images/writeups/the_great_disappearing_act/4_4.png)
+![stream request](/assets/images/writeups/thm/the_great_disappearing_act/4_4.png)
 
 This was an important discovery.
 
@@ -411,7 +411,7 @@ The modified request became:
 POST /v1/streams/request?tier=admin HTTP/1.1
 ```
 
-![request polluted on URL](/assets/images/writeups/the_great_disappearing_act/4_5.png)
+![request polluted on URL](/assets/images/writeups/thm/the_great_disappearing_act/4_5.png)
 
 The server returned a `ticket_id` for the requested stream.
 
@@ -425,7 +425,7 @@ I then examined the network request responsible for downloading the video.
 
 By modifying the relevant request, I was able to retrieve the administrator video.
 
-![network request modified and got password](/assets/images/writeups/the_great_disappearing_act/4_6.png)
+![network request modified and got password](/assets/images/writeups/thm/the_great_disappearing_act/4_6.png)
 
 The video contained an important clue:
 
@@ -441,7 +441,7 @@ I used the PIN from the administrator video to unlock the SCADA system.
 
 This produced the first half of the second flag.
 
-![flag first half](/assets/images/writeups/the_great_disappearing_act/4_7.png)
+![flag first half](/assets/images/writeups/thm/the_great_disappearing_act/4_7.png)
 
 At this point, I had:
 
@@ -479,7 +479,7 @@ The relevant entries were:
 #EXT-X-SESSION-DATA:DATA-ID="hopsec.jobs",VALUE="/v1/ingest/jobs"
 ```
 
-![RTSP URL, diagnostics, job](/assets/images/writeups/the_great_disappearing_act/5.png)
+![RTSP URL, diagnostics, job](/assets/images/writeups/thm/the_great_disappearing_act/5.png)
 
 This was a significant information leak.
 
@@ -499,11 +499,11 @@ The endpoint expected a POST request:
 POST /v1/ingest/diagnostics HTTP/1.1
 ```
 
-![diagnostics](/assets/images/writeups/the_great_disappearing_act/5_1.png)
+![diagnostics](/assets/images/writeups/thm/the_great_disappearing_act/5_1.png)
 
 When I sent the request without the required data, the server complained about an invalid `rtsp_url`.
 
-![invalid rtsp_url](/assets/images/writeups/the_great_disappearing_act/5_2.png)
+![invalid rtsp_url](/assets/images/writeups/thm/the_great_disappearing_act/5_2.png)
 
 This error message gave me exactly what I needed `rtsp_url`
 
@@ -523,7 +523,7 @@ The response referenced another endpoint:
 
 `GET /v1/ingest/jobs/fd086e09-1fc3-4b0c-8acc-6d034208adfe`
 
-![job_id](/assets/images/writeups/the_great_disappearing_act/5_3.png)
+![job_id](/assets/images/writeups/thm/the_great_disappearing_act/5_3.png)
 
 This created a new path:
 
@@ -547,7 +547,7 @@ The response contained a token.
 
 It also referenced port `13404`
 
-![token](/assets/images/writeups/the_great_disappearing_act/5_4.png)
+![token](/assets/images/writeups/thm/the_great_disappearing_act/5_4.png)
 
 This suggested that the token could be used against the service listening on port `13404`.
 
@@ -565,7 +565,7 @@ I supplied the token obtained from the API.
 
 This resulted in shell access as `svc_vidops`
 
-![nc and second half of the flag](/assets/images/writeups/the_great_disappearing_act/5_5.png)
+![nc and second half of the flag](/assets/images/writeups/thm/the_great_disappearing_act/5_5.png)
 
 The second half of the flag was also found here.
 
@@ -605,9 +605,9 @@ I searched for SUID binaries:
 find / -type f -perm /4000 2>/dev/null
 ```
 
-![SUID](/assets/images/writeups/the_great_disappearing_act/6.png)
+![SUID](/assets/images/writeups/thm/the_great_disappearing_act/6.png)
 
-![SUID](/assets/images/writeups/the_great_disappearing_act/6_1.png)
+![SUID](/assets/images/writeups/thm/the_great_disappearing_act/6_1.png)
 
 One interesting binary was `/usr/local/bin/diag_shell`
 
@@ -623,7 +623,7 @@ I inspected the file:
 ls -la /usr/local/bin/diag_shell
 ```
 
-![diag_shell](/assets/images/writeups/the_great_disappearing_act/6_2.png)
+![diag_shell](/assets/images/writeups/thm/the_great_disappearing_act/6_2.png)
 
 Executing the binary spawned a shell with the UID of `dockermgr`
 
@@ -653,7 +653,7 @@ Then I displayed the public key:
 cat id_ed25519.pub
 ```
 
-![ssh-keygen](/assets/images/writeups/the_great_disappearing_act/6_3.png)
+![ssh-keygen](/assets/images/writeups/thm/the_great_disappearing_act/6_3.png)
 
 I placed my public key inside `/home/dockermgr/.ssh/authorized_keys`
 
@@ -664,7 +664,7 @@ echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN9MKNSK4jFSYc03AgxyfM2/sw5sXZMG55hZmz
 > /home/dockermgr/.ssh/authorized_keys
 ```
 
-![.ssh authorized file](/assets/images/writeups/the_great_disappearing_act/6_4.png)
+![.ssh authorized file](/assets/images/writeups/thm/the_great_disappearing_act/6_4.png)
 
 I could then connect normally using SSH:
 
@@ -672,7 +672,7 @@ I could then connect normally using SSH:
 ssh -i id_ed25519 dockermgr@<target-ip>
 ```
 
-![ssh-login](/assets/images/writeups/the_great_disappearing_act/6_5.png)
+![ssh-login](/assets/images/writeups/thm/the_great_disappearing_act/6_5.png)
 
 This provided a stable session as `dockermgr`
 
@@ -708,7 +708,7 @@ Then I enumerated the files:
 ls
 ```
 
-![docker ps, exec](/assets/images/writeups/the_great_disappearing_act/6_6.png)
+![docker ps, exec](/assets/images/writeups/thm/the_great_disappearing_act/6_6.png)
 
 One particularly interesting file was `scada_terminal.py`
 
@@ -718,7 +718,7 @@ I examined it:
 cat scada_terminal.py
 ```
 
-![cat scada_terminal.py](/assets/images/writeups/the_great_disappearing_act/6_7.png)
+![cat scada_terminal.py](/assets/images/writeups/thm/the_great_disappearing_act/6_7.png)
 
 The Python source contained the unlock code required by the SCADA terminal.
 
@@ -730,7 +730,7 @@ I entered the unlock code into the SCADA terminal.
 
 This successfully unlocked the asylum exit and revealed the final flag from this stage.
 
-![asylum exit](/assets/images/writeups/the_great_disappearing_act/6_8.png)
+![asylum exit](/assets/images/writeups/thm/the_great_disappearing_act/6_8.png)
 
 At this point, the attack path had reached:
 
@@ -760,21 +760,21 @@ FLAG 3
 
 After retrieving the required flags, a new door appeared on the facility map.
 
-![door](/assets/images/writeups/the_great_disappearing_act/6_9.png)
+![door](/assets/images/writeups/thm/the_great_disappearing_act/6_9.png)
 
 Clicking the door presented a final challenge requiring the flags obtained during the room.
 
-![all 3 flags](/assets/images/writeups/the_great_disappearing_act/6_10.png)
+![all 3 flags](/assets/images/writeups/thm/the_great_disappearing_act/6_10.png)
 
 I entered the flags.
 
 The application then provided another flag/access code.
 
-![access flag](/assets/images/writeups/the_great_disappearing_act/6_11.png)
+![access flag](/assets/images/writeups/thm/the_great_disappearing_act/6_11.png)
 
 The page also provided an invitation to `Hoppers Origins Side Side Quest`
 
-![invite page](/assets/images/writeups/the_great_disappearing_act/6_12.png)
+![invite page](/assets/images/writeups/thm/the_great_disappearing_act/6_12.png)
 
 ---
 
@@ -987,7 +987,7 @@ Each stage of this room provided information that became useful in the next stag
 
 🖼️ **All process screenshots:**
 
-![All Process Screenshot](/assets/images/writeups/the_great_disappearing_act/all_process.png)
+![All Process Screenshot](/assets/images/writeups/thm/the_great_disappearing_act/all_process.png)
 
 ---
 

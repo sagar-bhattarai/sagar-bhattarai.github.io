@@ -5,7 +5,7 @@ date: 2026-11-01 08:44:12 +0545
 description: "Exploiting subtle differences in login error messages using Burp Suite Intruder to enumerate a valid username and password."
 
 categories: [PortSwigger, Authentication]
-tags: [burpsuite]
+tags: [burpsuite, grep-match, sniper-attack]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/authentication/uevsdr.png

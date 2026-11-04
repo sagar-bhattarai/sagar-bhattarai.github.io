@@ -68,7 +68,7 @@ So our initial attack surface becomes:
 
 9004 → Custom application
 
-![nmap](/assets/images/writeups/scheme_catcher/1.png)
+![nmap](/assets/images/writeups/thm/scheme_catcher/1.png)
 
 ---
 
@@ -82,7 +82,7 @@ http://<target-ip>
 
 only shows an **Under Construction** page.
 
-![Construction](/assets/images/writeups/scheme_catcher/2.png)
+![Construction](/assets/images/writeups/thm/scheme_catcher/2.png)
 
 This is a common situation during web enumeration.
 
@@ -108,7 +108,7 @@ Use `gobuster`:
 ```bash
 gobuster dir -u http://<target-ip> -w /usr/share/seclists/Discovery/Web-Content/big.txt -t 50   
 ```
-![gobuster](/assets/images/writeups/scheme_catcher/3.png)
+![gobuster](/assets/images/writeups/thm/scheme_catcher/3.png)
 
 ## Why gobuster?
 
@@ -138,7 +138,7 @@ Visit:
 
 `http://<target-ip>/dev/`
 
-![dev](/assets/images/writeups/scheme_catcher/3_1.png)
+![dev](/assets/images/writeups/thm/scheme_catcher/3_1.png)
 
 Directory listing is enabled.
 
@@ -180,7 +180,7 @@ Before immediately opening a binary in Ghidra, a very fast first step is:
 ```bash
 strings latest/beacon.bin
 ```
-![strings](/assets/images/writeups/scheme_catcher/4.png)
+![strings](/assets/images/writeups/thm/scheme_catcher/4.png)
 
 ## Why `strings`?
 
@@ -207,7 +207,7 @@ Host: localhost
 Socket server listening on port 4444...
 Ea<REDACTED>ss
 ```
-![menu](/assets/images/writeups/scheme_catcher/4_1.png)
+![menu](/assets/images/writeups/thm/scheme_catcher/4_1.png)
 
 The important discovery is:
 
@@ -274,7 +274,7 @@ However, option 1 is not yet enough to obtain access.
 
 ## Investigating Option 2
 
-![2](/assets/images/writeups/scheme_catcher/4_4.1.png)
+![2](/assets/images/writeups/thm/scheme_catcher/4_4.1.png)
 
 Choose:
 
@@ -328,7 +328,7 @@ Connection: close
 ```bash
 curl -iL http://10.48.154.46/7l<REDACTED>EF  
 ```
-![req](/assets/images/writeups/scheme_catcher/4_6.png)
+![req](/assets/images/writeups/thm/scheme_catcher/4_6.png)
 
 This is a major discovery.
 
@@ -344,7 +344,7 @@ Visit:
 
 `http://<target-ip>/7l<REDACTED>EF/`
 
-![7l<REDACTED>EF](/assets/images/writeups/scheme_catcher/4_7.png)
+![7l<REDACTED>EF](/assets/images/writeups/thm/scheme_catcher/4_7.png)
 
 Directory listing is enabled again.
 
@@ -366,7 +366,7 @@ curl -s http://<target-ip>/7l<REDACTED>EF/foothold.txt
 ```
 This contains the second flag.
 
-![2 flag](/assets/images/writeups/scheme_catcher/4_8.png)
+![2 flag](/assets/images/writeups/thm/scheme_catcher/4_8.png)
 
 ---
 
@@ -394,7 +394,7 @@ ld-linux-x86-64.so.2
 
 This is much more interesting than the first binary.
 
-![server](/assets/images/writeups/scheme_catcher/5_1.png)
+![server](/assets/images/writeups/thm/scheme_catcher/5_1.png)
 
 We now have:
 
@@ -436,7 +436,7 @@ create()
 update()
 delete()
 ```
-![ghrida](/assets/images/writeups/scheme_catcher/5_2.png)
+![ghrida](/assets/images/writeups/thm/scheme_catcher/5_2.png)
 
 ---
 
@@ -800,7 +800,7 @@ for heap_brute in range(16):
 python3 solve_server.py
 ```
 
-![solve_server](/assets/images/writeups/scheme_catcher/6.png)
+![solve_server](/assets/images/writeups/thm/scheme_catcher/6.png)
 
 This is practical because only a small portion of the relevant address needs to be guessed.
 
@@ -826,9 +826,9 @@ The shell is:
 root
 uid=0(root)
 ```
-![container root](/assets/images/writeups/scheme_catcher/6_1.png)
+![container root](/assets/images/writeups/thm/scheme_catcher/6_1.png)
 
-![flag](/assets/images/writeups/scheme_catcher/6_2.png)
+![flag](/assets/images/writeups/thm/scheme_catcher/6_2.png)
 
 But this is **container root**, not necessarily host root.
 
@@ -848,7 +848,7 @@ HOST
 
 Being root inside the container does not automatically mean we control the host.
 
-![id_rsa](/assets/images/writeups/scheme_catcher/7.png)
+![id_rsa](/assets/images/writeups/thm/scheme_catcher/7.png)
 
 ---
 
@@ -889,7 +889,7 @@ Then:
 ```bash
 ssh -i id_rsa agent@<target-ip>   
 ```
-![ssh](/assets/images/writeups/scheme_catcher/7_1.png)
+![ssh](/assets/images/writeups/thm/scheme_catcher/7_1.png)
 
 We now have:
 
@@ -952,7 +952,7 @@ Check whether it is loaded:
 ```bash
 lsmod | grep kagent
 ```
-![kagent](/assets/images/writeups/scheme_catcher/7_2.png)
+![kagent](/assets/images/writeups/thm/scheme_catcher/7_2.png)
 
 We see:
 
@@ -971,7 +971,7 @@ We can copy it to our machine:
 ```bash
 scp -i id_rsa agent@<target-ip>:/usr/lib/modules/6.14.0-1017-aws/kernel/drivers/kagent.ko .
 ```
-![scp](/assets/images/writeups/scheme_catcher/7_3.png)
+![scp](/assets/images/writeups/thm/scheme_catcher/7_3.png)
 
 
 > **Note**
@@ -1004,7 +1004,7 @@ Can user-controlled data overwrite kernel data?
 Are there information leaks?
 Is there a dangerous function pointer?
 ```
-![ghrida](/assets/images/writeups/scheme_catcher/7_4.png)
+![ghrida](/assets/images/writeups/thm/scheme_catcher/7_4.png)
 
 ---
 
@@ -1321,7 +1321,7 @@ pty.spawn("/bin/sh")
 ```bash
 python3 solve.py
 ```
-![solve](/assets/images/writeups/scheme_catcher/7_5.png)
+![solve](/assets/images/writeups/thm/scheme_catcher/7_5.png)
 
 The result is that our process becomes:
 

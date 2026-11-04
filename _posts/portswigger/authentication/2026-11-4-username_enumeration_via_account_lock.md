@@ -5,7 +5,7 @@ date: 2026-11-04 07:07:12 +0545
 description: "Enumerating valid usernames by exploiting account lockout behavior, then identifying a valid password using Burp Suite Intruder and Grep-Match."
 
 categories: [PortSwigger, Authentication]
-tags: [burpsuite, cluster-bomb-attack, grep-match, resource-pool]
+tags: [burpsuite, cluster-bomb-attack, sniper-attack, grep-match, resource-pool, rate-limiting]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/authentication/ueval.png

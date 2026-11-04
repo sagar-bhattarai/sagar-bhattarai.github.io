@@ -41,7 +41,7 @@ The scan revealed two open ports:
 - **631** (IPP)
 - **5000** (HTTP)
 
-![nmap](/assets/images/writeups/cupids_matchmaker/cupids_matchmaker.png)
+![nmap](/assets/images/writeups/thm/cupids_matchmaker/cupids_matchmaker.png)
 
 ---
 
@@ -52,15 +52,15 @@ Accessing port 5000 initially led Homepage. Nothing currently looks interesting,
 ```bash
 gobuster dir -u http://<target-ip>/static/  -w /usr/share/seclists/Discovery/Web-Content/big.txt
 ```
-![nmap](/assets/images/writeups/cupids_matchmaker/cupids_matchmaker_.png)
+![nmap](/assets/images/writeups/thm/cupids_matchmaker/cupids_matchmaker_.png)
 
 i found there was a login page and nothing more. 
 
-![nmap](/assets/images/writeups/cupids_matchmaker/cupids_matchmaker_3.png)
+![nmap](/assets/images/writeups/thm/cupids_matchmaker/cupids_matchmaker_3.png)
 
 then i tried to find out vulnerability in the `/survey` there i found a clue which was indicator to stored xss.
 
-![nmap](/assets/images/writeups/cupids_matchmaker/cupids_matchmaker_4.webp)
+![nmap](/assets/images/writeups/thm/cupids_matchmaker/cupids_matchmaker_4.webp)
 
 ie. In CTF terms, “a human reviews your submission” means a bot automatically opens submitted content in a browser. If any survey field is rendered as raw HTML without sanitisation, injected JavaScript will execute in the bot’s browser context — and anything it has access to (cookies, local storage, the page DOM) can be exfiltrated to an attacker-controlled listener.
 
@@ -82,7 +82,7 @@ Submitting the survey with the above XSS payload in the describe_yourself field.
 
 after a while the bot reviewer opens the submission, the script executes in its browser context, and the cookie is sent back to the listener.
 
-![nmap](/assets/images/writeups/cupids_matchmaker/cupids_matchmaker_5.png)
+![nmap](/assets/images/writeups/thm/cupids_matchmaker/cupids_matchmaker_5.png)
 
 here, i got flag.
 

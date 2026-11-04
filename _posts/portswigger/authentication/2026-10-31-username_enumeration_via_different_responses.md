@@ -5,7 +5,7 @@ date: 2026-10-31 12:21:12 +0545
 description: "Using Burp Suite Intruder to enumerate valid usernames and identify a valid password by analyzing differences in application responses."
 
 categories: [PortSwigger, Authentication]
-tags: [burpsuite]
+tags: [burpsuite, sniper-attack]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/authentication/uevdr.png

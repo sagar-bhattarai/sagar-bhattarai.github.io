@@ -5,7 +5,7 @@ date: 2026-10-31 08:08:08 +0545
 description: "Exploiting a Referer-based access control weakness to bypass administrative authorization and escalate a standard user's privileges using Burp Suite."
 
 categories: [PortSwigger, Access Control]
-tags: [burpsuite,idor]
+tags: [burpsuite, idor, referer]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/access_control/rbac.png

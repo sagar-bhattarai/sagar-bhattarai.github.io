@@ -5,7 +5,7 @@ date: 2026-11-02 07:51:12 +0545
 description: "Bypassing flawed IP-based brute-force protection by alternating authentication requests and automating login sequences with Burp Suite Intruder and Macros."
 
 categories: [PortSwigger, Authentication]
-tags: [burpsuite]
+tags: [burpsuite, pitchfork-attack, macros, resource-pool, rate-limiting]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/authentication/bbfpib.png

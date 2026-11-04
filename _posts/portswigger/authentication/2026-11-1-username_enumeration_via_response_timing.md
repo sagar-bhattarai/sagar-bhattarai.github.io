@@ -5,7 +5,7 @@ date: 2026-11-01 15:25:12 +0545
 description: "Exploiting response-time differences to enumerate valid usernames and passwords using Burp Suite Repeater, Intruder, and the X-Forwarded-For header."
 
 categories: [PortSwigger, Authentication]
-tags: [burpsuite]
+tags: [burpsuite, sniper-attack, x-forwarded-for, rate-limiting]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/authentication/uevrt.png
