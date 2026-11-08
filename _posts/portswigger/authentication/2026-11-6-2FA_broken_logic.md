@@ -1,6 +1,6 @@
 ---
 title: "2FA Broken Logic - PortSwigger"
-date: 2026-11-05 08:27:12 +0545
+date: 2026-11-06 08:07:12 +0545
 
 description: "Learn how flawed 2FA verification logic can allow an attacker to change the target account and bypass authentication by brute-forcing a four-digit MFA code."
 
