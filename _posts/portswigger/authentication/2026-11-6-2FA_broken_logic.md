@@ -5,7 +5,7 @@ date: 2026-11-06 08:07:12 +0545
 description: "Learn how flawed 2FA verification logic can allow an attacker to change the target account and bypass authentication by brute-forcing a four-digit MFA code."
 
 categories: [PortSwigger, Authentication]
-tags: [burpsuite, 2fa, authentication-bypass]
+tags: [burpsuite, 2fa, authentication-bypass, sniper-attack]
 
 image:
   path: /assets/img/posts_thumbnails/portswigger/authentication/2fabl.png
