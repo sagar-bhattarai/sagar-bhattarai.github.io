@@ -8,7 +8,7 @@ image:
 
 description: "Dreaming walkthrough covering web application enumeration, Lateral Movement and command substitution ( MySQL injection)"
   
-categories: [Web, Linux]
+categories: [Challenges, Web, Linux]
 tags: [web, linux, nmap, command substitution, MySQL injection]
 
 level: Easy

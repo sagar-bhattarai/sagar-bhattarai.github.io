@@ -8,7 +8,7 @@ image:
   path: /assets/img/posts_thumbnails/fools_mate.png
   alt: "Fools Mate TryHackMe"
 
-categories: [Web, Linux]
+categories: [Challenges, Web, Linux]
 tags: [web, linux, nmap, burpsuite, gobuster]
 
 level: Easy

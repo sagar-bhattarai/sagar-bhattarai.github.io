@@ -8,8 +8,8 @@ image:
 
 description: ... are the coverings of this Smol room.
 
-categories: [Windows]
-tags: [windows,]
+categories: [Challenges, Windows, Web]
+tags: [web, windows,]
 
 level: Medium
 platform: TryHackMe

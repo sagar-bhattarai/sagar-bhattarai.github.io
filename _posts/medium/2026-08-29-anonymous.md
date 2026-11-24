@@ -8,7 +8,7 @@ image:
 
 description: Minor misconfigurations—such as anonymous FTP access and excessive group privileges—can chained together leads to higher privileges were the coverings of this Anonymous room.
 
-categories: [Web, Linux]
+categories: [Challenges, Web, Linux]
 tags: [web, linux, nmap, smbclient, netcat, GTFOBins]
 
 level: Medium

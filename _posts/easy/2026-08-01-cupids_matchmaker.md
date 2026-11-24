@@ -8,7 +8,7 @@ image:
   path: /assets/img/posts_thumbnails/cupids_matchmaker.png
   alt: "cupids matchmaker TryHackMe"
 
-categories: [Web, Linux]
+categories: [Challenges, Web, Linux]
 tags: [web, linux, nmap]
 
 level: Easy

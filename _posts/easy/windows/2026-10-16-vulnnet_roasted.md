@@ -4,7 +4,7 @@ date: 2026-10-17 08:22:00 +0545
 
 description: "A Windows Active Directory penetration-testing walkthrough covering anonymous SMB enumeration, SID enumeration, AS-REP roasting, password cracking, exposed credentials, remote access, DCSync, and Pass-the-Hash."
 
-categories: [Windows, Active Directory]
+categories: [Challenges, Active Directory, Windows]
 tags: [windows, active-directory, smb, smbclient, nmap, impacket, as-rep-roasting, hashcat, john, netexec, winRM, dcsync, pass-the-hash]
 image:
   path: /assets/img/posts_thumbnails/vulnnet_roasted.png

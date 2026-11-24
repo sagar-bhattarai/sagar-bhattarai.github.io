@@ -4,7 +4,7 @@ date: 2026-09-09 09:09:09 +0545
 
 description: "A detailed walkthrough of exploiting a race condition, achieving Node.js RCE, and escalating privileges through a vulnerable cron job."
 
-categories: [Web, Linux ]
+categories: [Challenges, Web, Linux]
 tags: [web, linux, nmap, burpsuite, race-condition, nodejs, RCE, cronjob]
 
 image:

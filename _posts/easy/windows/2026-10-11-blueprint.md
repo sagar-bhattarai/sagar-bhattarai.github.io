@@ -8,8 +8,8 @@ image:
   path: /assets/img/posts_thumbnails/blueprint.png
   alt: "BluePrint - TryHackMe"
 
-categories: [Web, Windows]
-tags: [windows]
+categories: [Challenges, Windows, Web]
+tags: [web, windows]
 
 level: Easy
 platform: TryHackMe

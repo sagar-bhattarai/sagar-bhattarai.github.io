@@ -8,7 +8,7 @@ image:
 
 description: web enumeration, credential discovery, exploitation, and privilege escalation are the coverings of this Backtrack room.
 
-categories: [Web, Linux]
+categories: [Challenges, Web, Linux]
 tags: [web, linux, nmap]
 
 level: Medium

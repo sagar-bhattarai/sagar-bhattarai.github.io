@@ -4,7 +4,7 @@ date: 2026-09-20 10:17:25 +0545
 
 description: "A complete walkthrough of the TryHackMe You're in a cave room, covering web enumeration, Java serialization, XXE, reverse shells, SSH credential discovery, GPG, SUID/sudo enumeration, process manipulation, and Docker container escape."
 
-categories: [Web, Linux]
+categories: [Challenges, Web, Linux]
 tags: [web, linux, nmap, ffuf, hydra, sudo, burpsuite, xxe, java, serialization, ssh, gpg, docker,regular-expression, non-printing-characters]
 
 image:

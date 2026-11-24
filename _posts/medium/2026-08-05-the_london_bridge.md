@@ -8,7 +8,7 @@ image:
 
 description: Web Enumeration, SSRF (Server-Side Request Forgery), Internal Enumeration, Finding Sensitive Files, Initial Foothold, Linux Privilege Escalation and Post-Exploitation are the coverings of this The London Bridge room.
 
-categories: [Web, Linux]
+categories: [Challenges, Web, Linux]
 tags: [web, linux, nmap, gobuster, burpsuite, wfuzz, arjun, linpeas, netcat, gcc, firefox_decrypt]
 
 level: Medium

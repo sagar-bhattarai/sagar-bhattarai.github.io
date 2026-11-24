@@ -4,7 +4,7 @@ date: 2026-08-30 11:11:11 +0545
 
 description:  web enumeration, cookie manipulation, custom encryption decoding, SSH access, binary exploitation, and Linux privilege escalation through a wildcard injection in tar are the coverings of this Anonymous Playground room.
 
-categories: [Web, Linux]
+categories: [Challenges, Web, Linux]
 tags: [web, linux, nmap, gobuster, searchsploit, nuclei, 2-character-pairs-cipher, alphabet-position-cipher, pair-wise-alphabet-index, custom-substitution/encoding, reverse-engineering, malware-development, strings, file, stat, gdb, buffer-overflow, cronjob]
 
 image:

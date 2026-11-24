@@ -8,7 +8,7 @@ image:
   path: /assets/img/posts_thumbnails/investigating_windows.png
   alt: "Investigating Windows - TryHackMe"
 
-categories: [Windows, Digital Forensics]
+categories: [Challenges, Digital Forensics, Windows]
 tags: [windows, digital-forensics, event-viewer, powershell, registry, event-logs, incident-response, mimikatz]
 
 level: Easy

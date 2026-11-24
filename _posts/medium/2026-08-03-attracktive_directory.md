@@ -4,7 +4,7 @@ date: 2026-08-03 10:00:00 +0545
 
 description: Enumeration via kerberos, Abusing kerberos and elevating the privileges through misconfigured or disabled Pre-Authentication" are the coverings of this Attacktive Directory room .
 
-categories: [Web, Windows]
+categories: [Challenges, Web]
 tags: [web, windows, active-directory, nmap, kerberos, enum4linux, impacket, smbclient, john]
 
 image:
@@ -17,7 +17,7 @@ series: "Windows"
   
 room: "Attacktive Directory"
 type: "CTF Write-up"
-status: Completed 
+status: Completed  
 ---
 
 

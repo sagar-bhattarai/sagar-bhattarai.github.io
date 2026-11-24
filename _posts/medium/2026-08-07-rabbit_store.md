@@ -8,7 +8,7 @@ image:
 
 description: Exploitation of a mass assignment vulnerability to register an activated account, granting access to an API endpoint vulnerable to SSRF. Leveraging this SSRF vulnerability, we accessed the API documentation and discovered another endpoint vulnerable to SSTI, which we exploited to achieve RCE and gain a shell are the coverings of this Rabbit Store room.
 
-categories: [Web, Linux]
+categories: [Challenges, Web, Linux]
 tags: [web, linux, nmap, gobuster, burpsuite, SSRF, SSTI, JWT, RabbitMQ, erl-matter]
 
 level: Medium
